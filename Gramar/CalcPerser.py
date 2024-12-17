@@ -7,142 +7,84 @@ class CalcParser(Parser):
 
     precedence = (
         ('left', PLUS, MINUS),
-        ('left', TIMES, DIVIDE),
-        ('left', POWER)
+        ('left', TIMES, DIVIDE)
     )
 
-    def __init__(self):
-        self.postfix = []  # Lista do przechowywania wyniku w ONP
+    # Program główny
+    @_('PROGRAM IS declarations BEGIN statements END')
+    def program(self, p):
 
-    def is_number(self, number_str):
-        for letter in number_str:
-            if not (ord("0") <= ord(letter) <= ord("9")):
-                return False
-        return True
+        return {'type': 'program', 'declarations': p.declarations, 'statements': p.statements}
 
-    def change_postfix_to_group_numbers(self):
-        for i in range(len(self.postfix)):
-            if self.is_number(self.postfix[i]):
-                self.postfix[i] = GF1234577(int(self.postfix[i]))
-            elif len(self.postfix[i]) > 1:
-                if self.postfix[i][0] == "-" and self.is_number(self.postfix[i][1:]):
-                    self.postfix[i] = GF1234577(-1 * int(self.postfix[i][1:]))
-    #Function IS NOT responsible for returning errors - if everything is wrote corectly this should NEVER return negative
-    #number - we have some error returns just in case (so we dont get runtime error)
-    def count_res(self):
-        stos = []
-        i = 0
-        operations = ['+', '-', '*', ':', '^']
-        while i <= len(self.postfix):
-            if i == len(self.postfix):
-                if len(stos) == 1:
-                    return stos[0]
-                elif len(stos) > 1:
-                    return -3 # Tu much numbers
-                else:
-                    return -4 #not enough numburs
+    # Deklaracje zmiennych (IDENTIFIER)
+    @_('declarations COMMA IDENTIFIER')
+    def declarations(self, p):
+        return p.declarations + [p.IDENTIFIER]  # Dodajemy nową zmienną do listy deklaracji
 
-            if self.postfix[i] in operations:
-                if len(stos) < 2:
-                    return -1 #Error not enought numbers
-            if self.postfix[i] == '+':
-                stos.append(stos.pop() + stos.pop())
-            elif self.postfix[i] == '-':
-                stos.append(stos.pop() - stos.pop())
-            elif self.postfix[i] == '*':
-                stos.append(stos.pop() * stos.pop())
-            elif self.postfix[i] == ':':
-                a = stos.pop()
-                b = stos.pop()
-                try:
-                    stos.append(b / a)
-                except Exception as e:
-                    raise e
-            elif self.postfix[i] == '^':
-                a = stos.pop()
-                b = stos.pop()
-                stos.append(b ** a)
-            else:
-                if isinstance(self.postfix[i], GF1234577):
-                    stos.append(self.postfix[i])
-                else:
-                    return -2 #Error - unknown operation
-            i += 1
-        return -5 #While ended
+    @_('IDENTIFIER')
+    def declarations(self, p):
+        return [p.IDENTIFIER]  # Tylko jedna zmienna
 
-    def get_resoult(self):
-        return self.postfix
+    # Instrukcje
+    @_('statements statement')
+    def statements(self, p):
+        return p.statements + [p.statement]
 
+    @_('statement')
+    def statements(self, p):
+        return [p.statement]
 
-    @_('expr PLUS term')
-    @_('expr MINUS term')
-    def expr(self, p):
-        self.postfix.append(p[1])  # Dodaj operator do ONP
-        return f"{p.expr} {p.term} {p[1]}"
+    # Przypisanie zmiennej
+    @_('IDENTIFIER ASSIGN expression SEMICOLON')
+    def statement(self, p):
 
+        return {'type': 'assignment', 'variable': p.IDENTIFIER, 'value': p.expression}
 
+    # Instrukcja odczytu
+    @_('READ IDENTIFIER SEMICOLON')
+    def statement(self, p):
 
+        return {'type': 'read', 'variable': p.IDENTIFIER}
 
+    # Instrukcja wypisania
+    @_('WRITE expression SEMICOLON')
+    def statement(self, p):
+
+        return {'type': 'write', 'value': p.expression}
+
+    # Wyrażenie arytmetyczne
+    @_('expression PLUS term')
+    def expression(self, p):
+        return {'type': 'expression', 'left': p.expression, 'operator': '+', 'right': p.term}
 
     @_('term')
-    def expr(self, p):
+    def expression(self, p):
         return p.term
 
+    # Termin (operacje takie jak mnożenie, dzielenie, etc.)
     @_('term TIMES factor')
-    @_('term DIVIDE factor')
     def term(self, p):
-        self.postfix.append(p[1])
-        return f"{p.term} {p.factor} {p[1]}"
-
-    @_('factor POWER factor')
-    def term(self, p):
-        self.postfix.append(p[1])  # Dodaj operator '^' do ONP
-        return f"{p.factor0} {p.factor1} {p[1]}"
-
-    # Obsługuje przypadek, w którym operator występuje bez prawego operand
-    @_('expr PLUS')
-    @_('expr MINUS')
-    @_('expr TIMES')
-    @_('expr DIVIDE')
-    @_('expr POWER')
-    def expr(self, p):
-        raise ValueError(f"Error: Operator '{p[1]}' missing right operand")
-
-    # Obsługuje przypadek, w którym operator występuje bez lewego operand
-    @_('PLUS expr')
-    @_('MINUS expr')
-    @_('TIMES expr')
-    @_('DIVIDE expr')
-    @_('POWER expr')
-    def expr(self, p):
-        raise ValueError(f"Error: Operator '{p[1]}' missing left operand")
+        return {'type': 'term', 'left': p.term, 'operator': '*', 'right': p.factor}
 
     @_('factor')
     def term(self, p):
         return p.factor
 
-    @_('LPAREN expr RPAREN')
-    def factor(self, p):
-        return p.expr
-
-
+    # Czynnik - może to być liczba lub zmienna
     @_('NUMBER')
     def factor(self, p):
-        self.postfix.append(p.NUMBER)
-        return p.NUMBER
+        return {'type': 'number', 'value': int(p.NUMBER)}
 
-    @_('NUMBER NUMBER')
+    @_('IDENTIFIER')
     def factor(self, p):
-        raise ValueError(f"Was given 2 numbers in a row - not a arithmetical operation")
+        return {'type': 'identifier', 'name': p.IDENTIFIER}
 
-    @_('NEGATIVE')
+    # Obsługa nawiasów
+    @_('LPAREN expression RPAREN')
     def factor(self, p):
-        self.postfix.append(p.NEGATIVE)
-        return p.NEGATIVE
+        return p.expression
 
-    @_('NEGATIVE NEGATIVE')
-    def factor(self, p):
-        raise ValueError(f"Was given 2 numbers in a row - not a arithmetical operation")
-
-
+    # Obsługa błędów składniowych
+    def error(self, p):
+        print(f"Syntax error at line {p.lineno}")
 

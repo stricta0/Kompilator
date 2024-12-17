@@ -37,12 +37,4 @@ class PrepareData:
                 print(f"Error raised while making onp, error mesage: {e}", end=", ")
                 print("Skiping to next line")
                 continue
-            parser.change_postfix_to_group_numbers()
             ##print("ONP:", ' '.join(parser.postfix))
-            print(f"Wynik : {parser.get_resoult()}")
-            try:
-                print(f"Wynik : {parser.count_res()}")
-            except Exception as e:
-                print(f"Error raised while calculating result, error mesage: {e}", end=", ")
-                print("Skiping to next line")
-                continue
