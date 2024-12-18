@@ -1,11 +1,16 @@
-from translation import Arytmetic, Systemic
+from translation import Arytmetic, Systemic, Register
 
 class Translator:
 
     def __init__(self, string_to_translate):
         self.text = string_to_translate
+        #This dic has var_name : i, where i is indeks of this var in end code,
+        #only execption is Variables["reg"] witch contains a var thats currently in register
+        #and infor if it was changed thruout the program
         self.Variables = {}
+        self.Variables["help"] = 1
         self.decripted = ""
+        self.register = Register()
 
     def translate(self):
         self.declaration(self.text["declarations"])
@@ -22,16 +27,17 @@ class Translator:
         for var in variabouls:
             self.Variables[var] = i
             i += 1
+        self.Variables["help"] = i
 
     def statements(self):
-        arytmetic = Arytmetic(self.Variables)
-        systemic = Systemic(self.Variables)
+        arytmetic = Arytmetic(self.Variables, self.register)
+        systemic = Systemic(self.Variables, self.register)
         for statement in self.text["statements"]:
             if statement["type"] == "read":
-                systemic.read(statement)
+                line = systemic.read(statement)
                 continue
             if statement["type"] == "assignment":
-                arytmetic.assigment(statement, statement["variable"],statement["value"])
+                line = arytmetic.assigment(statement)
                 continue
             if statement["type"] == "read":
 
