@@ -1,6 +1,7 @@
 from sly import Parser, Lexer
 from Gramar import CalcLexer
 from Gramar import GF1234577
+from Errors_custom import PerserError
 
 class CalcParser(Parser):
     tokens = CalcLexer.tokens
@@ -86,5 +87,5 @@ class CalcParser(Parser):
 
     # Obsługa błędów składniowych
     def error(self, p):
-        print(f"Syntax error at line {p.lineno}")
+        raise PerserError(p.lineno, f"cant proces {p.type} in this context")
 

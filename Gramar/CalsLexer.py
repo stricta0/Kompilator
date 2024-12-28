@@ -1,4 +1,5 @@
 from sly import Lexer
+from Errors_custom import LexerError
 
 class CalcLexer(Lexer):
     # Tokeny (słowa kluczowe, operatory, symbole)
@@ -62,5 +63,4 @@ class CalcLexer(Lexer):
 
     # Obsługa błędów leksykalnych
     def error(self, t):
-        print(f"Illegal character '{t.value[0]}' at line {self.lineno}")
-        self.index += 1
+        raise LexerError(self.lineno, f"Illegal character '{t.value[0]}'")
