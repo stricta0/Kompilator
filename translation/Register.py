@@ -21,7 +21,8 @@ class Register:
         return f"STORE {self.Variables[var]}\n"
 
     def store_helper(self):
-        return f"STORE {self.Variables['help']}\n"
+        self.has_changed_since_load = True
+        return f"STORE {self.Variables['first_empty']}\n"
 
     def add(self, var):
         if var not in self.Variables:
@@ -38,4 +39,18 @@ class Register:
     def set_comand(self, x):
         self.has_changed_since_load = True
         return f"SET {x}\n"
+
+    def put(self, i):
+        return f"PUT {i}\n"
+
+    def put_var(self, var_name):
+        return f"PUT {self.Variables[var_name]}\n"
+
+    def get_comand(self, i):
+        self.has_changed_since_load = True
+        return f"GET {i}\n"
+
+    def get_comand_var(self, var_name):
+        self.has_changed_since_load = True
+        return f"GET {self.Variables[var_name]}\n"
 

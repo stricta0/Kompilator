@@ -34,11 +34,9 @@ if __name__ == '__main__':
         transletor = Translator(result)
         transletor.translate()
         transletor.print()
-        transletor.statements()
+        res = transletor.get_code()
+
         print(transletor.Variables)
-        # print("Parsing completed successfully!")
-        # print("Result: ", result)  # Wynik parsowania (zdefiniowany przez reguły)
-        # print(result["declarations"])
     except Exception as e:
-        print("Error during parsing: ", e)
+        print("Error during kompilation: ", e)
 

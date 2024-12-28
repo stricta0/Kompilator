@@ -26,28 +26,37 @@ class Arytmetic:
     #operatio n right to register
     #leave resoult in register
     def solve_expression(self, expresion):
+        print("solve expresion\n")
         left = expresion['left']
+        print(left)
         left_part = self.value_loader(left)
+        print(left_part)
         right = expresion['right']
+        print(right)
         right_part = self.value_loader(right)
+        print(right_part)
         operation = expresion['operator']
         if operation == "+":
-            return add(left_part, right_part)
+            print("add operation")
+            return self.add(left_part, right_part)
         if operation == "-":
-
+            pass
         if operation == "%":
-
+            pass
         if operation == "/":
-
+            pass
         if operation == "*":
+            pass
+
 
 
     def add(self, left, right):
-        return f"{left}{self.register.store_helper()}{right}ADD {self.Variables['help']}"
+        return f"{left}{self.register.store_helper()}{right}ADD {self.Variables['first_empty']}\n"
     def sub(self, left, right):
-        return f"{left}{self.register.store_helper()}{right}SUB {self.Variables['help']}"
+        return f"{left}{self.register.store_helper()}{right}SUB {self.Variables['first_empty']}\n"
     def devide(self, left, right):
-
+        pass
     def multiple(self, left, right):
-
+        pass
     def modulo(self, left, right):
+        pass

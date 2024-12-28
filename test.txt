@@ -1,7 +1,5 @@
 PROGRAM IS
 x, y, c
 BEGIN
-    READ x;
     y := x + 5;
-    WRITE y;
 END
