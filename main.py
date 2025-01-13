@@ -46,7 +46,7 @@ def bash_config(fast=False):
 if __name__ == '__main__':
     lexer = CalcLexer()
     parser = CalcParser()
-    file, end_file_name = bash_config(True)
+    file, end_file_name = bash_config()
     #see tokens - just for making process
     # print("Tokens:")
     # for tok in lexer.tokenize(file):

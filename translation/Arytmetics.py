@@ -1,5 +1,3 @@
-from idlelib.autocomplete import completion_kwds
-
 
 class Arytmetic:
     def __init__(self, Variables, register):

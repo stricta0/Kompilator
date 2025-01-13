@@ -1,30 +1,23 @@
-from unittest.mock import right
-
-
-def divide(a, b):
+def dzielenie(a, b):
     if b == 0:
-        raise ValueError("Division by zero is not allowed.")
+        return 0
 
-    quotient = 0
-    power = 1
-    original_b = b
-    copy_b = b
-
-    # Podwajamy b i power aż b > a
-    while b < a:
-        b = b + b  # Mnożenie przez 2 za pomocą dodawania
-        power = power + power  # Mnożenie przez 2 za pomocą dodawania
-
-    if b == a:
-        return power
-
-    while b > a:
-        b = b - original_b
-        power = power - 1
+    save_power = 0
+    old_b = b
 
 
-    return power
+    while True:
+        power = 1
 
-
-# Przykład użycia
-print(divide(45, 5))
+        while b < a: #b - a < 0
+            b = b + b
+            power = power + power
+        if b == a:
+            return power + save_power
+        power = power // 2
+        b = b // 2
+        save_power += power
+        a = a - b
+        b = old_b
+        if b > a:
+            return save_power

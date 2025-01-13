@@ -32,3 +32,21 @@ class Systemic:
     def assigment_reg(self, var):
         comand = self.register.store(var)
         return comand
+
+    def create_tab(self, tab_name, start, end, line):
+        if start > end:
+            raise ValueError(f"at line {line.lineno}, cant create tab with start < end!")
+
+        comand  = ""
+        comand += self.register.set_comand(start)
+
+        line, self.Variables[tab_name] = self.register.store_helper_multiple_vars()  #tab_name przechowuje start indeks tablicy
+        comand += line
+        for i in range(start, end+1):
+            self.Variables['number_of_vars'] += 1 #zarezerwuj zmienna
+
+    def get_val_from_tab(self, tab_name, i):
+        indeks_of_first_indeks = self.Variables[tab_name] #ideks obiektu przechowujacego rozmiar tablicy
+        compand = ""
+        compand += self.register.load_var_number(indeks_of_first_indeks) #reg = start_tablicy
+        compand += self.register.sub()
