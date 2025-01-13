@@ -8,19 +8,17 @@ class Translator:
         #only execption is Variables["reg"] witch contains a var thats currently in register
         #and infor if it was changed thruout the program
         self.Variables = {}
-        self.Variables["first_empty"] = 1
+        self.Variables["number_of_vars"] = 1
         self.decripted = ""
         self.register = Register(self.Variables)
 
+
     def translate(self):
         self.declaration(self.text["declarations"])
-        print("deklaracja")
         self.statements(self.text["statements"])
-        print("statments")
 
     def get_code(self):
         return self.decripted
-
 
     def print(self):
         print("Input: ")
@@ -36,22 +34,23 @@ class Translator:
             self.Variables[var] = i
             i += 1
         self.Variables["reg"] = 0
-        self.Variables["first_empty"] = i
+        self.Variables["number_of_vars"] = i
 
 
 
     def statements(self, statments_tab):
+        print("Starting statements")
+        print(statments_tab)
         arytmetic = Arytmetic(self.Variables, self.register)
         systemic = Systemic(self.Variables, self.register)
         code = ""
-        print("declaration of arytmetic and systemic ended")
         for statement in statments_tab:
             print(statement)
+            self.register.lineno = statement["lineno"]
             line = ""
             if statement["type"] == "read":
                 line = systemic.read(statement)
             if statement["type"] == "write":
-                print("write")
                 if statement["value"]["type"] == "identifier":
                     line = systemic.write_var(statement["value"]["name"])
                 if statement["value"]["type"] == "number":
@@ -69,7 +68,10 @@ class Translator:
                     line = systemic.assigment_number(statement["variable"],statement["value"]["value"])
                 if statement["value"]["type"] == "expression":
                     exp = arytmetic.solve_expression(statement["value"])
-                    line = exp + systemic.assigment_reg(statement["variable"])
+                    asign_to = systemic.assigment_reg(statement["variable"])
+                    line = exp + asign_to
+                    print("koniec exp")
+                    print(f"exp: \n{exp}\nasign_to:\n{asign_to}")
 
             if statement["type"] == "read":
                 pass
@@ -80,3 +82,4 @@ class Translator:
             code += line
 
         self.decripted = code
+        

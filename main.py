@@ -7,8 +7,14 @@ from File_menadger import FileMenadger
 
 file_menadger = FileMenadger()
 
-def bash_config():
+#Fast is just for develompment
+def bash_config(fast=False):
     #Open arguments
+    if fast:
+        file_name = ".\\test.txt"
+        end_file_name = ".\\end.txt"
+        file = file_menadger.read(file_name)
+        return file, end_file_name
     if len(sys.argv) < 3:
         print("USAGE: py main.py 'code_to_compile.txt' 'name_of_compiled_file.txt'")
         sys.exit(1)
@@ -40,13 +46,12 @@ def bash_config():
 if __name__ == '__main__':
     lexer = CalcLexer()
     parser = CalcParser()
-    file, end_file_name = bash_config()
+    file, end_file_name = bash_config(True)
     #see tokens - just for making process
     # print("Tokens:")
     # for tok in lexer.tokenize(file):
     #     print(tok)
 
-    print("Lexing and parsing the file...")
     try:
         result = parser.parse(lexer.tokenize(file))
         transletor = Translator(result)

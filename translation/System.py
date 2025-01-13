@@ -2,6 +2,7 @@ class Systemic:
     def __init__(self, Variables, register):
         self.Variables = Variables
         self.register = register
+        self.lineno = 0
 
     def read(self, statement):
         var = statement["variable"]

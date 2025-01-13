@@ -15,7 +15,7 @@ class CalcParser(Parser):
     @_('PROGRAM IS declarations BEGIN statements END')
     def program(self, p):
 
-        return {'type': 'program', 'declarations': p.declarations, 'statements': p.statements}
+        return {'type': 'program', 'declarations': p.declarations, 'statements': p.statements, 'lineno':p.lineno}
 
     # Deklaracje zmiennych (IDENTIFIER)
     @_('declarations COMMA IDENTIFIER')
@@ -39,24 +39,28 @@ class CalcParser(Parser):
     @_('IDENTIFIER ASSIGN expression SEMICOLON')
     def statement(self, p):
 
-        return {'type': 'assignment', 'variable': p.IDENTIFIER, 'value': p.expression}
+        return {'type': 'assignment', 'variable': p.IDENTIFIER, 'value': p.expression, 'lineno':p.lineno}
 
     # Instrukcja odczytu
     @_('READ IDENTIFIER SEMICOLON')
     def statement(self, p):
 
-        return {'type': 'read', 'variable': p.IDENTIFIER}
+        return {'type': 'read', 'variable': p.IDENTIFIER, 'lineno':p.lineno}
 
     # Instrukcja wypisania
     @_('WRITE expression SEMICOLON')
     def statement(self, p):
 
-        return {'type': 'write', 'value': p.expression}
+        return {'type': 'write', 'value': p.expression, 'lineno':p.lineno}
 
     # Wyrażenie arytmetyczne
     @_('expression PLUS term')
     def expression(self, p):
-        return {'type': 'expression', 'left': p.expression, 'operator': '+', 'right': p.term}
+        return {'type': 'expression', 'left': p.expression, 'operator': '+', 'right': p.term, 'lineno':p.lineno}
+
+    @_('expression MINUS term')
+    def expression(self, p):
+        return {'type': 'expression', 'left': p.expression, 'operator': '-', 'right': p.term, 'lineno': p.lineno}
 
     @_('term')
     def expression(self, p):
@@ -65,20 +69,25 @@ class CalcParser(Parser):
     # Termin (operacje takie jak mnożenie, dzielenie, etc.)
     @_('term TIMES factor')
     def term(self, p):
-        return {'type': 'term', 'left': p.term, 'operator': '*', 'right': p.factor}
+        return {'type': 'expression', 'left': p.term, 'operator': '*', 'right': p.factor, 'lineno':p.lineno}
 
     @_('factor')
     def term(self, p):
         return p.factor
 
     # Czynnik - może to być liczba lub zmienna
+    @_('MINUS NUMBER')
+    def factor(self, p):
+        return {'type': 'number', 'value': int(p.NUMBER) * -1, 'lineno': p.lineno}
+
+    # Czynnik - może to być liczba lub zmienna
     @_('NUMBER')
     def factor(self, p):
-        return {'type': 'number', 'value': int(p.NUMBER)}
+        return {'type': 'number', 'value': int(p.NUMBER), 'lineno':p.lineno}
 
     @_('IDENTIFIER')
     def factor(self, p):
-        return {'type': 'identifier', 'name': p.IDENTIFIER}
+        return {'type': 'identifier', 'name': p.IDENTIFIER, 'lineno':p.lineno}
 
     # Obsługa nawiasów
     @_('LPAREN expression RPAREN')

@@ -1,0 +1,54 @@
+a = 2, b = 101
+#Rosyjskie mnozenie chłopskie - co by o nich nie mówić dobrze mnożyli
+SET 0
+STORE 5 #zapisana 0 zeby zamieniac boole
+SET 1
+STORE 6 #zapisane 1 zeby zamieniac boole
+#Zakładam że ogólnie w programie te 2 wartości będą zapisane - są to chyba najczęściej wykorzystywane liczby w wrzechświecie więc no
+
+LOAD 5
+STORE 1 #wynik = 0
+STORE 4 #wynik_is_ujemny
+SET b
+STORE 3 #stworz i zapisz b
+JNEG 2
+JUMP 6
+SUB 3 #b - b = 0
+SUB 3 #0 - b = -b
+STORE 3 #zapisz -b (zamien z ujemnej na dodatnia)
+LOAD 6 #reg = 1
+STORE 4 #wynik_is_ujemny = 1
+SET a
+STORE 2 #stworz i zapisz a
+JNEG 2
+JUMP 11
+SUB 2 #a - a = 0
+SUB 2 #0 - a = -a
+STORE 2 #zapisz -a (zamien z ujemnej na dodatnia)
+LOAD 4 #reg = wynik_is_ujemny
+JZERO 4
+LOAD 5 #IF wynik_is_ujemny!=0
+STORE 4 #wynik_is_ujemny = 0
+JUMP 3
+LOAD 6 #IF wynik_is_ujemny==0
+STORE 4 #wymik is ujemny = 1
+#poczatek petli - reg = a
+HALF #reg = a//2
+ADD 0 #reg = a//2 * 2
+SUB 2 #a//2 * a - a = -1 jeśli a się nie dzili i 0 jeśli się dzieli
+JZERO 4
+#IF a % 2 != 0:
+LOAD 1 #load wynik
+ADD 3 #dodaj b
+STORE 1 #wynik = b (wynik += b)
+# Koniec if
+LOAD 3
+ADD 3
+STORE 3 # b+=b
+LOAD 2
+HALF
+STORE 2 #a = a//2
+JPOS -13 #not sure - wracamy do poczatku petli
+LOAD 1 #wczytaj wynik
+
+

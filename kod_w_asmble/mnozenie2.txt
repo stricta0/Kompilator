@@ -1,0 +1,14 @@
+1 - left side (a)
+2 - right side (b)
+
+LOAD 1 #load a
+SUB one_val
+JZERO 8
+LOAD 2
+ADD 2
+STORE 2 #b = b*2
+LOAD 1 #petla
+HALF
+STORE 1 #a = a//2
+JUMP -8
+#koniec

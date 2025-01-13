@@ -1,5 +1,5 @@
 PROGRAM IS
 x, y, c
 BEGIN
-    y := x + 5;
+    y := x + 5 * c - 7;
 END
