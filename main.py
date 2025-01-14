@@ -46,7 +46,7 @@ def bash_config(fast=False):
 if __name__ == '__main__':
     lexer = CalcLexer()
     parser = CalcParser()
-    file, end_file_name = bash_config()
+    file, end_file_name = bash_config(True)
     #see tokens - just for making process
     # print("Tokens:")
     # for tok in lexer.tokenize(file):
@@ -64,6 +64,6 @@ if __name__ == '__main__':
         print(e)
     except FileNotFoundError as e:
         print("Error while dealing with file: ", e)
-    except Exception as e:
-        print("Unknown error with message: ", e)
+    # except Exception as e:
+    #     print("Unknown error with message: ", e)
 

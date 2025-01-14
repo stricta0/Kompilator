@@ -7,5 +7,7 @@ def mnozenie(a, b):
         a = a // 2
     return wynik
 
-print(mnozenie(-20, -58))
+#print(mnozenie(-20, -58))
 #print(-1//2)
+com = "MARKED JUMP"
+print(com[:6])

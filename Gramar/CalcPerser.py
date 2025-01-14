@@ -71,6 +71,11 @@ class CalcParser(Parser):
     def term(self, p):
         return {'type': 'expression', 'left': p.term, 'operator': '*', 'right': p.factor, 'lineno':p.lineno}
 
+    # Termin (operacje takie jak mnożenie, dzielenie, etc.)
+    @_('term DIVIDE factor')
+    def term(self, p):
+        return {'type': 'expression', 'left': p.term, 'operator': '/', 'right': p.factor, 'lineno': p.lineno}
+
     @_('factor')
     def term(self, p):
         return p.factor

@@ -7,12 +7,12 @@ JZERO 2
 JUMP 3
 LOAD 0git
 JUMP koniec
-LOAD 0
+LOAD zero
 STORE save_power
 
 
 #Poczatek petli
-LOAD 1
+LOAD one
 STORE power #power = 1
 LOAD b
 SUB A #reg = b - a
@@ -23,7 +23,7 @@ STORE power #power = power + power
 LOAD b
 ADD b
 STORE b #b = b + b
-JUMP -9
+JUMP -8
 LOAD b
 SUB a #reg = b - a
 JZERO 2 #if b == a

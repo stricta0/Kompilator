@@ -32,7 +32,7 @@ class Arytmetic:
         if operation == "%":
             pass
         if operation == "/":
-            pass
+            return self.devide(left_part, right_part, left, right)
         if operation == "*":
             print("wykryto *")
             return self.multiple(left_part, right_part, left, right)
@@ -76,10 +76,115 @@ class Arytmetic:
         comand += self.register.sub(x)
         return comand
 
-    def devide(self, left, right):
-        pass
+    def devide(self,left, right, left_token, right_token):
+        if left_token['type'] == 'number' and right_token['type'] == 'number':
+            comand = ""
+            left_val = left_token['value']
+            right_val = right_token['value']
+            if right_val == 0:
+                comand += self.register.make_0_and_1_if_dont_exist_already()
+                comand += self.register.load_var_number(self.register.zero_indeks)
+                return comand
+            resoult_of_multiple = left_val // right_val
+            comand += self.register.set_comand(resoult_of_multiple)
+            return comand  # Jesli mnozymy 2 liczby to nie ma co sie bawic - dzielimy na etapie kompilacji
+        if right_token['type'] == 'number': #lewy token bedacy liczba za duzo nie daje
+            right_val = right_token['value']
+            comand = ""
+            if right_val == 0:
+                comand += self.register.make_0_and_1_if_dont_exist_already()
+                comand += self.register.load_var_number(self.register.zero_indeks)
+                return comand
+            is_negaitve = False
+            if right_val < 0:
+                right_val *= -1
+                is_negaitve = True
+
+            if self.is_power_of_2(right_val):
+                comand += left  # wykonaj lewa strone
+                while right_val > 1:
+                    right_val = right_val // 2
+                    comand += self.register.half()
+                if is_negaitve:
+                    comand += self.register.sub(0)
+                    comand += self.register.sub(0)
+                return comand
+        #dzielenie zwykle juz w programie
+        comand = ""
+        print("LAST DEVIDE HEHE")
+        comand += self.register.make_0_and_1_if_dont_exist_already()
+        comand += left  # oblicz lewa strone
+        line, a = self.register.store_helper_multiple_vars()
+        comand += line  # a = left_side
+        comand += right
+        line, b= self.register.store_helper_multiple_vars() #b = right side
+        comand += line
+        line, old_b = self.register.store_helper_multiple_vars() #old b = b
+        comand += line
+        comand += self.register.jzero(2) #if b == 0:
+        comand += self.register.jump(3) #if b!= 0:
+        comand += self.register.load_var_number(self.register.zero_indeks) # a // 0 = 0 (wedlug definicji programu nie matematyki)
+        comand += self.register.marked_jump("END", "JUMP") #koniec! #was 36
+
+
+        comand += self.register.load_var_number(self.register.zero_indeks)
+        line, save_power = self.register.store_helper_multiple_vars() #save_power = 0
+        comand += line
+        power = self.register.create_var_but_dont_store() #stworz zmienna power ale nie dodawaj do comand
+        #chcemy stworzyc ta zmienna ale na poczatku petli i tak trzeba ja ustawic na 1 wiec nie trzeba tego
+        #robic teraz
+
+        #poczatek petli
+        comand += self.register.load_var_number(self.register.one_indeks)
+        comand += self.register.store_number_var(power) #power = 1
+        comand += self.register.load_var_number(b) #reg = b
+        comand += self.register.sub(a) #reg = b - a
+        comand += self.register.jneg(8) #if b - a < 0 : zakoncz petle
+
+        #cialo petli while b < a
+        comand += self.register.load_var_number(power) #reg = power
+        comand += self.register.add(power) #reg = 2power
+        comand += self.register.store_number_var(power) #power = 2power
+
+        comand += self.register.load_var_number(b) #reg = b
+        comand += self.register.add(b) #reg = 2b
+        comand += self.register.store_number_var(b) #b = 2b
+
+        comand += self.register.jump(-8) #wroc do poczatku petli
+        #koniec petli while b < a
+        comand += self.register.load_var_number(b) # reg = b
+        comand += self.register.sub(a) #reg = b - a
+        comand += self.register.jzero(2) #if b == a
+        comand += self.register.jump(4) #else
+        comand += self.register.load_var_number(power) #reg = power
+        comand += self.register.add(save_power) # reg = power + save_power
+        comand += self.register.jump(15) #end - koniec dzielenia
+        comand += self.register.load_var_number(power)
+        comand += self.register.half()
+        comand += self.register.store_number_var(power) #power = power // 2
+        comand += self.register.add(save_power) #reg = power + save_power
+        comand += self.register.store_number_var(save_power) #save_power = power + save_power
+        comand += self.register.load_var_number(a) #reg = a
+        comand += self.register.sub(b) #reg = a - b
+        comand += self.register.store_number_var(a) #a = a - b
+        comand += self.register.load_var_number(old_b)
+        comand += self.register.store_number_var(b) #b = old_b
+        comand += self.register.sub(a) #reg = b - a
+        comand += self.register.jpos(2) #if b > a - zakoncz program
+        comand += self.register.jump(-31) #else wroc do petli
+        comand += self.register.load_var_number(save_power) #reg = save_power (wynik)
+        comand += self.register.add_mark("END")
+        return comand
+
+
+
+
+
+
     def devide_helper(self, x, y):
         pass
+
+
     def multiple(self,left, right, left_token, right_token):
         comand = ""
         if left_token['type'] == 'number' and right_token['type'] == 'number':

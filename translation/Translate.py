@@ -1,4 +1,4 @@
-from translation import Arytmetic, Systemic, Register
+from translation import Arytmetic, Systemic, Register, EndOfFileChanges
 
 class Translator:
 
@@ -16,6 +16,11 @@ class Translator:
     def translate(self):
         self.declaration(self.text["declarations"])
         self.statements(self.text["statements"])
+        self.end_file_changes()
+
+    def end_file_changes(self):
+        end_file = EndOfFileChanges(self.decripted)
+        self.decripted = end_file.marks_adj()
 
     def get_code(self):
         return self.decripted
