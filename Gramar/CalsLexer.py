@@ -7,7 +7,8 @@ class CalcLexer(Lexer):
         PROGRAM, PROCEDURE, IS, BEGIN, END, READ, WRITE, IF, THEN, ELSE, ENDIF,
         FOR, FROM, TO, DOWNTO, ENDFOR, REPEAT, UNTIL, WHILE, DO, ENDWHILE,
         ASSIGN, IDENTIFIER, NUMBER,
-        PLUS, MINUS, TIMES, DIVIDE, MOD, LPAREN, RPAREN, SEMICOLON, COMMA
+        PLUS, MINUS, TIMES, DIVIDE, MOD, LPAREN, RPAREN, SEMICOLON, COMMA,
+        LTABPAREN, RTABPAREN, COLON
     }
 
     # Ignorowane znaki (spacje, tabulatory)
@@ -46,6 +47,9 @@ class CalcLexer(Lexer):
     RPAREN = r'\)'
     SEMICOLON = r';'
     COMMA = r','
+    LTABPAREN = r'\['
+    RTABPAREN = r'\]'
+    COLON = r':'
 
     # Identyfikatory i liczby
     IDENTIFIER = r'[a-zA-Z_][a-zA-Z0-9_]*'
@@ -63,4 +67,4 @@ class CalcLexer(Lexer):
 
     # Obsługa błędów leksykalnych
     def error(self, t):
-        raise LexerError(self.lineno, f"Illegal character '{t.value[0]}'")
+        raise LexerError(self.lineno, f"Illegal character '{t.value[0]}' file: CalsLexer.py")

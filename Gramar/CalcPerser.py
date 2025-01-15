@@ -22,6 +22,7 @@ class CalcParser(Parser):
     def declarations(self, p):
         return p.declarations + [p.IDENTIFIER]  # Dodajemy nową zmienną do listy deklaracji
 
+
     @_('IDENTIFIER')
     def declarations(self, p):
         return [p.IDENTIFIER]  # Tylko jedna zmienna

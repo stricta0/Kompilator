@@ -145,3 +145,7 @@ class Register:
 
     def add_mark(self, mark_name):
         return f"MARKER {mark_name}\n"
+
+    def load_i_var_number(self, val):
+        self.has_changed_since_load = True
+        return f"LOADI {val}"
