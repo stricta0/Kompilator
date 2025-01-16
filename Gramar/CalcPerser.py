@@ -17,15 +17,38 @@ class CalcParser(Parser):
 
         return {'type': 'program', 'declarations': p.declarations, 'statements': p.statements, 'lineno':p.lineno}
 
+    # Reguła do rozpoznawania tablicy z zakresami
+    @_('declarations COMMA IDENTIFIER LTABPAREN index_range RTABPAREN')
+    def declarations(self, p):
+        print("tablica :)")
+        return p.declarations + [{"type": "table", "name" : p.IDENTIFIER, "range" : p.index_range, 'lineno':p.lineno}]
+
     # Deklaracje zmiennych (IDENTIFIER)
     @_('declarations COMMA IDENTIFIER')
     def declarations(self, p):
-        return p.declarations + [p.IDENTIFIER]  # Dodajemy nową zmienną do listy deklaracji
+        return p.declarations + [{"type": "variable", "name" : p.IDENTIFIER, 'lineno':p.lineno}]  # Dodajemy nową zmienną do listy deklaracji
 
 
+    # Reguła do rozpoznawania zakresu indeksów (start:koniec)
+    @_('index COLON index')
+    def index_range(self, p):
+        return {'start': p.index0, 'end': p.index1}
+
+    # Reguła do rozpoznawania pojedynczego indeksu, który może być ujemny
+    @_('MINUS NUMBER')
+    def index(self, p):
+        return -int(p.NUMBER)
+
+    @_('NUMBER')
+    def index(self, p):
+        return int(p.NUMBER)
+
+    @_('IDENTIFIER LTABPAREN index_range RTABPAREN')
+    def declarations(self, p):
+        return [{"type": "table", "name": p.IDENTIFIER, "range": p.index_range, 'lineno':p.lineno}]
     @_('IDENTIFIER')
     def declarations(self, p):
-        return [p.IDENTIFIER]  # Tylko jedna zmienna
+        return [{"type": "variable", "name" : p.IDENTIFIER, 'lineno':p.lineno}]  # Tylko jedna zmienna
 
     # Instrukcje
     @_('statements statement')
@@ -36,11 +59,18 @@ class CalcParser(Parser):
     def statements(self, p):
         return [p.statement]
 
+
+    @_('IDENTIFIER LTABPAREN index_range RTABPAREN ASSIGN expression SEMICOLON')
+    def statement(self, p):
+        return {'type': 'assignment', 'variable': p.IDENTIFIER, 'value': p.expression, 'lineno':p.lineno}
+
+
     # Przypisanie zmiennej
     @_('IDENTIFIER ASSIGN expression SEMICOLON')
     def statement(self, p):
 
         return {'type': 'assignment', 'variable': p.IDENTIFIER, 'value': p.expression, 'lineno':p.lineno}
+
 
     # Instrukcja odczytu
     @_('READ IDENTIFIER SEMICOLON')

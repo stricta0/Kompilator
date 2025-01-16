@@ -11,6 +11,8 @@ class Translator:
         self.Variables["number_of_vars"] = 1
         self.decripted = ""
         self.register = Register(self.Variables)
+        self.arytmetic = Arytmetic(self.Variables, self.register)
+        self.systemic = Systemic(self.Variables, self.register)
 
 
     def translate(self):
@@ -35,9 +37,17 @@ class Translator:
     #jaka zmienna się znajduje a potem korzystać z tych "adresów"
     def declaration(self, variabouls):
         i = 1
-        for var in variabouls:
-            self.Variables[var] = i
-            i += 1
+        for var_element in variabouls:
+            if var_element["type"] == "variable":
+                var = var_element["name"]
+                self.Variables[var] = i
+                i += 1
+            if var_element["type"] == "table":
+                table_name = var_element["name"]
+                line_no = var_element["lineno"]
+                start = var_element["range"]["start"]
+                end = var_element["range"]["end"]
+                self.systemic.create_tab(table_name, start, end, line_no)
         self.Variables["reg"] = 0
         self.Variables["number_of_vars"] = i
 
@@ -46,34 +56,33 @@ class Translator:
     def statements(self, statments_tab):
         print("Starting statements")
         print(statments_tab)
-        arytmetic = Arytmetic(self.Variables, self.register)
-        systemic = Systemic(self.Variables, self.register)
+
         code = ""
         for statement in statments_tab:
             print(statement)
             self.register.lineno = statement["lineno"]
             line = ""
             if statement["type"] == "read":
-                line = systemic.read(statement)
+                line = self.systemic.read(statement)
             if statement["type"] == "write":
                 if statement["value"]["type"] == "identifier":
-                    line = systemic.write_var(statement["value"]["name"])
+                    line = self.systemic.write_var(statement["value"]["name"])
                 if statement["value"]["type"] == "number":
-                    line = systemic.write_number(statement)
+                    line = self.systemic.write_number(statement)
                 if statement["value"]["type"] == "expression":
-                    exp = arytmetic.solve_expression(statement["value"])
-                    line = exp + systemic.write_var("reg")
+                    exp = self.arytmetic.solve_expression(statement["value"])
+                    line = exp + self.systemic.write_var("reg")
 
 
             if statement["type"] == "assignment":
                 # line = arytmetic.assigment(statement)
                 if statement["value"]["type"] == "identifier":
-                    line = systemic.assigment_var(statement["variable"],statement["value"]["name"])
+                    line = self.systemic.assigment_var(statement["variable"],statement["value"]["name"])
                 if statement["value"]["type"] == "number":
-                    line = systemic.assigment_number(statement["variable"],statement["value"]["value"])
+                    line = self.systemic.assigment_number(statement["variable"],statement["value"]["value"])
                 if statement["value"]["type"] == "expression":
-                    exp = arytmetic.solve_expression(statement["value"])
-                    asign_to = systemic.assigment_reg(statement["variable"])
+                    exp = self.arytmetic.solve_expression(statement["value"])
+                    asign_to = self.systemic.assigment_reg(statement["variable"])
                     line = exp + asign_to
                     print("koniec exp")
                     print(f"exp: \n{exp}\nasign_to:\n{asign_to}")

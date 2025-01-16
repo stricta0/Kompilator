@@ -1,5 +1,5 @@
 PROGRAM IS
-x, y, c
+tab[-5:10], y
 BEGIN
-    y := x / c;
+y := 5;
 END

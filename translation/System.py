@@ -33,9 +33,9 @@ class Systemic:
         comand = self.register.store(var)
         return comand
 
-    def create_tab(self, tab_name, start, end, line):
+    def create_tab(self, tab_name, start, end, lineno):
         if start > end:
-            raise ValueError(f"at line {line.lineno}, cant create tab with start < end!")
+            raise ValueError(f"at line {lineno}, cant create tab with start < end!")
 
         comand  = ""
         comand += self.register.set_comand(start) #reg = start
