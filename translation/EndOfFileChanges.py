@@ -6,12 +6,15 @@ class EndOfFileChanges:
         print("MARKS_ADJ IN PLAY")
         marks_dic = {}
         comands_list = self.comand.split("\n")
+        line_counter = 1
         for i in range(len(comands_list)):
             comand = comands_list[i]
             if comand[:6] == "MARKER":
                 comand_l = comand.split(" ")
                 mark_name = comand_l[1]
-                marks_dic[mark_name] = i+1
+                marks_dic[mark_name] = line_counter #was = i
+            else:
+                line_counter += 1
         new_comand = ""
         for i in range(len(comands_list)):
             comand = comands_list[i]
