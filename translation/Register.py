@@ -148,4 +148,20 @@ class Register:
 
     def load_i_var_number(self, val):
         self.has_changed_since_load = True
-        return f"LOADI {val}"
+        return f"LOADI {val}\n"
+
+    def load_i_var(self, val):
+        self.check_if_variable_exists(val)
+        self.has_changed_since_load = True
+        return f"LOADI {self.Variables[val]}\n"
+
+
+    def store_i_var_number(self, val):
+        self.has_changed_since_load = True
+        return f"STOREI {val}\n"
+
+
+    def store_i_var(self, var_name):
+        self.check_if_variable_exists(var_name)
+        self.has_changed_since_load = True
+        return f"STOREI {self.Variables[var_name]}\n"

@@ -60,16 +60,15 @@ class CalcParser(Parser):
         return [p.statement]
 
 
-    @_('IDENTIFIER LTABPAREN index_range RTABPAREN ASSIGN expression SEMICOLON')
+    @_('IDENTIFIER LTABPAREN expression RTABPAREN ASSIGN expression SEMICOLON')
     def statement(self, p):
-        return {'type': 'assignment', 'variable': p.IDENTIFIER, 'value': p.expression, 'lineno':p.lineno}
+        return {'type': 'assignment', 'variable': p.IDENTIFIER, 'variable_type': 'table' ,'value': p.expression1, 'lineno':p.lineno, 'indeks' : p.expression0}
 
 
     # Przypisanie zmiennej
     @_('IDENTIFIER ASSIGN expression SEMICOLON')
     def statement(self, p):
-
-        return {'type': 'assignment', 'variable': p.IDENTIFIER, 'value': p.expression, 'lineno':p.lineno}
+        return {'type': 'assignment', 'variable': p.IDENTIFIER, 'variable_type': 'variable' ,'value': p.expression, 'lineno':p.lineno}
 
 
     # Instrukcja odczytu
@@ -121,9 +120,13 @@ class CalcParser(Parser):
     def factor(self, p):
         return {'type': 'number', 'value': int(p.NUMBER), 'lineno':p.lineno}
 
+    @_('IDENTIFIER LTABPAREN expression RTABPAREN')
+    def factor(self, p):
+        return {'type': 'identifier', 'name': p.IDENTIFIER, 'lineno': p.lineno, 'var_type': 'table', 'indeks': p.expression}
+
     @_('IDENTIFIER')
     def factor(self, p):
-        return {'type': 'identifier', 'name': p.IDENTIFIER, 'lineno':p.lineno}
+        return {'type': 'identifier', 'name': p.IDENTIFIER, 'lineno':p.lineno, 'var_type': 'var'}
 
     # Obsługa nawiasów
     @_('LPAREN expression RPAREN')

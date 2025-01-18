@@ -1,5 +1,6 @@
 PROGRAM IS
-tab[-5:10], y
+x, y, z, tab[-5 : 10]
 BEGIN
-y := 5;
+    tab[2] := 4;
+    tab[-5] := tab[2];
 END

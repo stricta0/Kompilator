@@ -36,21 +36,36 @@ class Translator:
     #nie musimy tworzyć zmiennych w kodzie - wystarczy zapamiętać gdzie
     #jaka zmienna się znajduje a potem korzystać z tych "adresów"
     def declaration(self, variabouls):
-        i = 1
+        self.Variables["number_of_vars"] = 1
+        comand = ""
         for var_element in variabouls:
             if var_element["type"] == "variable":
                 var = var_element["name"]
-                self.Variables[var] = i
-                i += 1
+                self.Variables[var] = self.Variables["number_of_vars"]
+                self.Variables["number_of_vars"] += 1
             if var_element["type"] == "table":
                 table_name = var_element["name"]
                 line_no = var_element["lineno"]
                 start = var_element["range"]["start"]
                 end = var_element["range"]["end"]
-                self.systemic.create_tab(table_name, start, end, line_no)
+                comand += self.systemic.create_tab(table_name, start, end, line_no)
         self.Variables["reg"] = 0
-        self.Variables["number_of_vars"] = i
+        self.Variables["_helper"] = self.Variables["number_of_vars"]
+        self.Variables["number_of_vars"] += 1
+        self.decripted += comand
 
+    def save_value_from_statement_in_reg(self, statement): #save statment in reg
+
+        if statement["type"] == "identifier":
+            if statement["var_type"] == "var":
+                return self.register.load_var(statement["name"])
+            if statement["var_type"] == "table":
+                comand = self.save_value_from_statement_in_reg(statement["indeks"])
+                return comand + self.systemic.load_tab_i(statement['name'])
+        if statement["type"] == "number":
+            return self.register.set_comand(statement["value"])
+        if statement["type"] == "expression":
+            return self.arytmetic.solve_expression(statement)
 
 
     def statements(self, statments_tab):
@@ -65,27 +80,21 @@ class Translator:
             if statement["type"] == "read":
                 line = self.systemic.read(statement)
             if statement["type"] == "write":
-                if statement["value"]["type"] == "identifier":
-                    line = self.systemic.write_var(statement["value"]["name"])
-                if statement["value"]["type"] == "number":
-                    line = self.systemic.write_number(statement)
-                if statement["value"]["type"] == "expression":
-                    exp = self.arytmetic.solve_expression(statement["value"])
-                    line = exp + self.systemic.write_var("reg")
-
-
+                exp = self.save_value_from_statement_in_reg(statement["value"])
+                line = exp + self.systemic.write_var("reg")
             if statement["type"] == "assignment":
-                # line = arytmetic.assigment(statement)
-                if statement["value"]["type"] == "identifier":
-                    line = self.systemic.assigment_var(statement["variable"],statement["value"]["name"])
-                if statement["value"]["type"] == "number":
-                    line = self.systemic.assigment_number(statement["variable"],statement["value"]["value"])
-                if statement["value"]["type"] == "expression":
-                    exp = self.arytmetic.solve_expression(statement["value"])
+                if statement["variable_type"] == "variable":
+                    exp = self.save_value_from_statement_in_reg(statement["value"])
                     asign_to = self.systemic.assigment_reg(statement["variable"])
                     line = exp + asign_to
-                    print("koniec exp")
-                    print(f"exp: \n{exp}\nasign_to:\n{asign_to}")
+                if statement["variable_type"] == "table":
+                    line = self.save_value_from_statement_in_reg(statement["indeks"]) #reg = i
+                    line_h, helper = self.systemic.store_tab_addres_in__helper(statement["variable"])
+                    line +=  line_h #_helper = faktyczne i (adres tab[i] w vm)
+                    line += self.save_value_from_statement_in_reg(statement["value"]) #reg = value po prawej od znaku :=
+                    line += self.register.store_i_var_number(helper) #adres który jest pod _helper (czyli adres tab[i]) = reg
+
+
 
             if statement["type"] == "read":
                 pass
@@ -95,5 +104,5 @@ class Translator:
 
             code += line
 
-        self.decripted = code
+        self.decripted += code
         

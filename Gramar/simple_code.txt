@@ -1,16 +1,18 @@
-# Binarna postać liczby
-PROGRAM IS
-	n, p
-BEGIN
-    READ n;
-    REPEAT
-	p:=n/2;
-	p:=2*p;
-	IF n>p THEN
-	    WRITE 1;
-	ELSE
-	    WRITE 0;
-	ENDIF
-	n:=n/2;
-    UNTIL n=0;
-END
+    SET 5
+    STORE 4
+    SET 6
+    ADD 4
+    STORE 4
+    SET 2
+    ADD 4
+    STORE 22
+    SET 4
+    STOREI 22
+    SET -5
+    ADD 4
+    STORE 23
+    SET 2
+    ADD 4
+    STORE 24
+LOADI 24
+STOREI 23
