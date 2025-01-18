@@ -231,6 +231,7 @@ class Arytmetic:
         comand += self.register.jump(-31) #else wroc do petli
         comand += self.register.load_var_number(save_power) #reg = save_power (wynik)
         comand += self.register.add_mark("END")
+        self.register.new_marks() #dont use the same markers next time
         return comand
 
 

@@ -1,5 +1,8 @@
 PROGRAM IS
 a, b, y
 BEGIN
-    y := 5 + 3 * y <= b * 3 + y;
+    IF a > 0 THEN
+        a := 0;
+        b := 5;
+    ENDIF
 END

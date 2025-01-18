@@ -10,6 +10,7 @@ class Register:
         self.bool_exists = False
         self.zero_indeks = None
         self.one_indeks = None
+        self.mark_zone = 0
 
 
     def check_if_variable_exists(self, var):
@@ -129,7 +130,7 @@ class Register:
 
     def marked_jump(self, mark_name, jump_type):
         self.has_changed_since_load = True
-        return f"MARKED {jump_type} {mark_name}\n"
+        return f"MARKED {jump_type} {mark_name}_{self.mark_zone}\n"
 
     def jpos(self, j):
         self.has_changed_since_load = True
@@ -144,7 +145,10 @@ class Register:
         return f"JNEG {j}\n"
 
     def add_mark(self, mark_name):
-        return f"MARKER {mark_name}\n"
+        return f"MARKER {mark_name}_{self.mark_zone}\n"
+
+    def new_marks(self):
+        self.mark_zone += 1
 
     def load_i_var_number(self, val):
         self.has_changed_since_load = True

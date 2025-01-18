@@ -56,6 +56,15 @@ class CalcParser(Parser):
     def statements(self, p):
         return p.statements + [p.statement]
 
+    @_('IF check THEN statements ELSE statements ENDIF')
+    def statement(self, p):
+        print("if statment read")
+        return {'type' : 'if', 'check' : p.check, 'body' : p.statements0, 'else' : p.statements1, 'lineno':p.lineno}
+
+    @_('IF check THEN statements ENDIF')
+    def statement(self, p):
+        print("if statment read")
+        return {'type': 'if', 'check': p.check, 'body': p.statements, 'else': None, 'lineno':p.lineno}
 
     @_('statement')
     def statements(self, p):

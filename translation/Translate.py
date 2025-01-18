@@ -79,6 +79,16 @@ class Translator:
             print(statement)
             self.register.lineno = statement["lineno"]
             line = ""
+            if statement["type"] == "if":
+                line = self.save_value_from_statement_in_reg(statement['check']) #load check into reg
+                line += self.register.marked_jump("else_m", "JZERO")
+                line += self.statements(statement["body"])
+                line += self.register.marked_jump("end_m", "JUMP")
+                line += self.register.add_mark("else_m")
+                line += self.statements(statement["else"])
+                line += self.register.add_mark("end_m")
+                self.register.new_marks()
+
             if statement["type"] == "read":
                 line = self.systemic.read(statement)
             if statement["type"] == "write":
@@ -107,4 +117,5 @@ class Translator:
             code += line
 
         self.decripted += code
+        return code
         
