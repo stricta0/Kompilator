@@ -1,5 +1,5 @@
 PROGRAM IS
-tab[-5:10], y
+a, b, y
 BEGIN
-y := 5;
+    y := 5 + 3 * y > b * 3 + y;
 END

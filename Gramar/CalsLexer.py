@@ -8,7 +8,8 @@ class CalcLexer(Lexer):
         FOR, FROM, TO, DOWNTO, ENDFOR, REPEAT, UNTIL, WHILE, DO, ENDWHILE,
         ASSIGN, IDENTIFIER, NUMBER,
         PLUS, MINUS, TIMES, DIVIDE, MOD, LPAREN, RPAREN, SEMICOLON, COMMA,
-        LTABPAREN, RTABPAREN, COLON
+        LTABPAREN, RTABPAREN, COLON,
+        MOREOREQUALTHAN, LESSOREQUALTHAN, MORETHAN, LESSTHAN
     }
 
     # Ignorowane znaki (spacje, tabulatory)
@@ -50,7 +51,10 @@ class CalcLexer(Lexer):
     LTABPAREN = r'\['
     RTABPAREN = r'\]'
     COLON = r':'
-
+    MOREOREQUALTHAN = r'>='
+    LESSOREQUALTHAN = r'<='
+    MORETHAN = r'>'
+    LESSTHAN = r'<'
     # Identyfikatory i liczby
     IDENTIFIER = r'[a-zA-Z_][a-zA-Z0-9_]*'
     NUMBER = r'\d+'

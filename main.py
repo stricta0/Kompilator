@@ -48,9 +48,9 @@ if __name__ == '__main__':
     parser = CalcParser()
     file, end_file_name = bash_config()
     #see tokens - just for making process
-    # print("Tokens:")
-    # for tok in lexer.tokenize(file):
-    #     print(tok)
+    print("Tokens:")
+    for tok in lexer.tokenize(file):
+        print(tok)
 
     try:
         result = parser.parse(lexer.tokenize(file))
