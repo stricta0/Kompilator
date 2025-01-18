@@ -1,1 +1,18 @@
+    SET 0
+    STORE 5
+    SET 1
+    STORE 6
+    SET 0
+    STORE 7
+    LOAD 1
+SUB 7
+JPOS 3
+LOAD 5
+JUMP 2
+LOAD 6
+JZERO 5
+SET 0
+STORE 1
+SET 5
+STORE 2
 

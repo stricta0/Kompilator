@@ -41,7 +41,7 @@ class Arytmetic:
 
     #returns True or False (reg = 1 - true, reg = 0 -> false)
     def solve_comparison(self, comparision):
-        comand = ""
+        comand = self.register.make_0_and_1_if_dont_exist_already()
         right = self.value_loader(comparision["right"])
         comand += right #reg = right
 
@@ -62,7 +62,8 @@ class Arytmetic:
     #reg = a - b
     #returns reg = True or False (1 or 0)
     def comparison_type_solve(self, comp_type):
-        comand = self.register.make_0_and_1_if_dont_exist_already()
+
+        comand = ""
         if comp_type == "=":
             comand += self.register.jzero(3)
             comand += self.register.load_var_number(self.register.zero_indeks)
