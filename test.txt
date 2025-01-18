@@ -1,6 +1,5 @@
 PROGRAM IS
-x, y, z, tab[-5 : 10]
+a, b, y
 BEGIN
-    tab[2] := 4;
-    tab[-5] := tab[2];
+    y := 5 + 3 * y > b * 3 + y;
 END

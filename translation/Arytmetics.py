@@ -14,6 +14,8 @@ class Arytmetic:
             right = self.register.set_comand(value['value'])
         elif value['type'] == "identifier":
             right = self.register.load_var(value['name'])
+        elif value['type'] == "comparison":
+            right = self.solve_comparison(value)
         return right
     #seve left to register
     #operatio n right to register
@@ -37,6 +39,59 @@ class Arytmetic:
             print("wykryto *")
             return self.multiple(left_part, right_part, left, right)
 
+    #returns True or False (reg = 1 - true, reg = 0 -> false)
+    def solve_comparison(self, comparision):
+        comand = ""
+        right = self.value_loader(comparision["right"])
+        comand += right #reg = right
+
+        line, right_val = self.register.store_helper_multiple_vars()
+        comand += line #right_val = right
+
+        left = self.value_loader(comparision["left"]) #reg = left
+        comand += left
+
+        comand += self.register.sub(left) #reg = right - left
+
+        comand += self.comparison_type_solve(comparision["operator"])
+        return comand
+
+
+    #reg = a - b
+    #returns reg = True or False (1 or 0)
+    def comparison_type_solve(self, type):
+        comand = self.register.make_0_and_1_if_dont_exist_already()
+        if type == "==":
+            comand += self.register.jzero(3)
+            comand += self.register.load_var_number(self.register.zero_indeks)
+            comand += self.register.jump(2)
+            comand += self.register.load_var_number(self.register.one_indeks)
+        if type == "!=":
+            comand += self.register.jzero(3)
+            comand += self.register.load_var_number(self.register.one_indeks)
+            comand += self.register.jump(2)
+            comand += self.register.load_var_number(self.register.zero_indeks)
+        if type == ">":
+            comand += self.register.jpos(3)
+            comand += self.register.load_var_number(self.register.zero_indeks)
+            comand += self.register.jump(2)
+            comand += self.register.load_var_number(self.register.one_indeks)
+        if type == "<":
+            comand += self.register.jneg(3)
+            comand += self.register.load_var_number(self.register.zero_indeks)
+            comand += self.register.jump(2)
+            comand += self.register.load_var_number(self.register.one_indeks)
+        if type == ">=":
+            comand += self.register.jneg(3)
+            comand += self.register.load_var_number(self.register.one_indeks)
+            comand += self.register.jump(2)
+            comand += self.register.load_var_number(self.register.zero_indeks)
+        if type == "<=":
+            comand += self.register.jpos(3)
+            comand += self.register.load_var_number(self.register.one_indeks)
+            comand += self.register.jump(2)
+            comand += self.register.load_var_number(self.register.zero_indeks)
+        return comand
 
 
     def add(self, left, right, left_token, right_token):

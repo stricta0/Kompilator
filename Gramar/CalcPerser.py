@@ -7,6 +7,7 @@ class CalcParser(Parser):
     tokens = CalcLexer.tokens
 
     precedence = (
+        ('left', MORETHAN, LESSTHAN, MOREOREQUALTHAN, LESSOREQUALTHAN),
         ('left', PLUS, MINUS),
         ('left', TIMES, DIVIDE)
     )
@@ -55,6 +56,7 @@ class CalcParser(Parser):
     def statements(self, p):
         return p.statements + [p.statement]
 
+
     @_('statement')
     def statements(self, p):
         return [p.statement]
@@ -63,6 +65,7 @@ class CalcParser(Parser):
     @_('IDENTIFIER LTABPAREN expression RTABPAREN ASSIGN expression SEMICOLON')
     def statement(self, p):
         return {'type': 'assignment', 'variable': p.IDENTIFIER, 'variable_type': 'table' ,'value': p.expression1, 'lineno':p.lineno, 'indeks' : p.expression0}
+
 
 
     # Przypisanie zmiennej
@@ -83,6 +86,27 @@ class CalcParser(Parser):
 
         return {'type': 'write', 'value': p.expression, 'lineno':p.lineno}
 
+    # Reguła dla porównań
+    @_('expression MORETHAN expression')
+    def check(self, p):
+        return {'type': 'comparison', 'operator': '>', 'left': p.expression0, 'right': p.expression1,
+                'lineno': p.lineno}
+
+    @_('expression LESSTHAN expression')
+    def check(self, p):
+        return {'type': 'comparison', 'operator': '<', 'left': p.expression0, 'right': p.expression1,
+                'lineno': p.lineno}
+
+    @_('expression MOREOREQUALTHAN expression')
+    def check(self, p):
+        return {'type': 'comparison', 'operator': '>=', 'left': p.expression0, 'right': p.expression1,
+                'lineno': p.lineno}
+
+    @_('expression LESSOREQUALTHAN expression')
+    def check(self, p):
+        return {'type': 'comparison', 'operator': '<=', 'left': p.expression0, 'right': p.expression1,
+                'lineno': p.lineno}
+
     # Wyrażenie arytmetyczne
     @_('expression PLUS term')
     def expression(self, p):
@@ -92,6 +116,9 @@ class CalcParser(Parser):
     def expression(self, p):
         return {'type': 'expression', 'left': p.expression, 'operator': '-', 'right': p.term, 'lineno': p.lineno}
 
+    @_('check')
+    def expression(self, p):
+        return p.check
     @_('term')
     def expression(self, p):
         return p.term
