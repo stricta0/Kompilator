@@ -9,7 +9,7 @@ class CalcLexer(Lexer):
         ASSIGN, IDENTIFIER, NUMBER,
         PLUS, MINUS, TIMES, DIVIDE, MOD, LPAREN, RPAREN, SEMICOLON, COMMA,
         LTABPAREN, RTABPAREN, COLON,
-        MOREOREQUALTHAN, LESSOREQUALTHAN, MORETHAN, LESSTHAN
+        MOREOREQUALTHAN, LESSOREQUALTHAN, MORETHAN, LESSTHAN, EQUAL, NOTEQUAL
     }
 
     # Ignorowane znaki (spacje, tabulatory)
@@ -51,6 +51,8 @@ class CalcLexer(Lexer):
     LTABPAREN = r'\['
     RTABPAREN = r'\]'
     COLON = r':'
+    EQUAL = r'='
+    NOTEQUAL = r"!="
     MOREOREQUALTHAN = r'>='
     LESSOREQUALTHAN = r'<='
     MORETHAN = r'>'

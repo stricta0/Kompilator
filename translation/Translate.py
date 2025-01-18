@@ -66,6 +66,8 @@ class Translator:
             return self.register.set_comand(statement["value"])
         if statement["type"] == "expression":
             return self.arytmetic.solve_expression(statement)
+        if statement["type"] == "comparison":
+            return self.arytmetic.solve_comparison(statement)
 
 
     def statements(self, statments_tab):

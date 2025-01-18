@@ -51,42 +51,44 @@ class Arytmetic:
         left = self.value_loader(comparision["left"]) #reg = left
         comand += left
 
-        comand += self.register.sub(left) #reg = right - left
+
+        comand += self.register.sub(right_val) #reg = left - right
 
         comand += self.comparison_type_solve(comparision["operator"])
+        print(f"SOLVE COMP: \n{comand}")
         return comand
 
 
     #reg = a - b
     #returns reg = True or False (1 or 0)
-    def comparison_type_solve(self, type):
+    def comparison_type_solve(self, comp_type):
         comand = self.register.make_0_and_1_if_dont_exist_already()
-        if type == "==":
+        if comp_type == "=":
             comand += self.register.jzero(3)
             comand += self.register.load_var_number(self.register.zero_indeks)
             comand += self.register.jump(2)
             comand += self.register.load_var_number(self.register.one_indeks)
-        if type == "!=":
+        if comp_type == "!=":
             comand += self.register.jzero(3)
             comand += self.register.load_var_number(self.register.one_indeks)
             comand += self.register.jump(2)
             comand += self.register.load_var_number(self.register.zero_indeks)
-        if type == ">":
+        if comp_type == ">":
             comand += self.register.jpos(3)
             comand += self.register.load_var_number(self.register.zero_indeks)
             comand += self.register.jump(2)
             comand += self.register.load_var_number(self.register.one_indeks)
-        if type == "<":
+        if comp_type == "<":
             comand += self.register.jneg(3)
             comand += self.register.load_var_number(self.register.zero_indeks)
             comand += self.register.jump(2)
             comand += self.register.load_var_number(self.register.one_indeks)
-        if type == ">=":
+        if comp_type == ">=":
             comand += self.register.jneg(3)
             comand += self.register.load_var_number(self.register.one_indeks)
             comand += self.register.jump(2)
             comand += self.register.load_var_number(self.register.zero_indeks)
-        if type == "<=":
+        if comp_type == "<=":
             comand += self.register.jpos(3)
             comand += self.register.load_var_number(self.register.one_indeks)
             comand += self.register.jump(2)

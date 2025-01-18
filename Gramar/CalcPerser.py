@@ -7,7 +7,7 @@ class CalcParser(Parser):
     tokens = CalcLexer.tokens
 
     precedence = (
-        ('left', MORETHAN, LESSTHAN, MOREOREQUALTHAN, LESSOREQUALTHAN),
+        ('left', MORETHAN, LESSTHAN, MOREOREQUALTHAN, LESSOREQUALTHAN, EQUAL, NOTEQUAL),
         ('left', PLUS, MINUS),
         ('left', TIMES, DIVIDE)
     )
@@ -86,6 +86,8 @@ class CalcParser(Parser):
 
         return {'type': 'write', 'value': p.expression, 'lineno':p.lineno}
 
+
+
     # Reguła dla porównań
     @_('expression MORETHAN expression')
     def check(self, p):
@@ -105,6 +107,16 @@ class CalcParser(Parser):
     @_('expression LESSOREQUALTHAN expression')
     def check(self, p):
         return {'type': 'comparison', 'operator': '<=', 'left': p.expression0, 'right': p.expression1,
+                'lineno': p.lineno}
+
+    @_('expression EQUAL expression')
+    def check(self, p):
+        return {'type': 'comparison', 'operator': '=', 'left': p.expression0, 'right': p.expression1,
+                'lineno': p.lineno}
+
+    @_('expression NOTEQUAL expression')
+    def check(self, p):
+        return {'type': 'comparison', 'operator': '!=', 'left': p.expression0, 'right': p.expression1,
                 'lineno': p.lineno}
 
     # Wyrażenie arytmetyczne

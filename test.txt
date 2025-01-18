@@ -1,5 +1,5 @@
 PROGRAM IS
 a, b, y
 BEGIN
-    y := 5 + 3 * y > b * 3 + y;
+    y := 5 + 3 * y <= b * 3 + y;
 END
