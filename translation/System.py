@@ -6,8 +6,8 @@ class Systemic:
 
     def read(self, statement):
         var = statement["variable"]
-        comad = self.register.get_comand_var(var)
-        return comad
+        comand = self.register.get_comand(var)
+        return comand
 
     def write_var(self, var):
         comand = self.register.put_var(var)

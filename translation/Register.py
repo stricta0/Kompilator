@@ -92,15 +92,10 @@ class Register:
         return f"PUT {self.Variables[var_name]}\n"
 
     def get_comand(self, i):
-        print("SOME COMMMAND 4")
+        self.check_if_variable_exists(i)
         self.has_changed_since_load = True
-        return f"GET {i}\n"
+        return f"GET {self.Variables[i]}\n"
 
-    def get_comand_var(self, var_name):
-        print("SOME COMMMAND 3")
-        self.check_if_variable_exists(var_name)
-        self.has_changed_since_load = True
-        return f"GET {self.Variables[var_name]}\n"
 
     def go_back_to_last_reg(self):
         self.has_changed_since_load = False
@@ -144,6 +139,9 @@ class Register:
         self.has_changed_since_load = True
         return f"JNEG {j}\n"
 
+    def add_statick_mark(self, mark_name):
+        return f"MARKER {mark_name}\n"
+
     def add_mark(self, mark_name):
         return f"MARKER {mark_name}_{self.mark_zone}\n"
 
@@ -169,3 +167,8 @@ class Register:
         self.check_if_variable_exists(var_name)
         self.has_changed_since_load = True
         return f"STOREI {self.Variables[var_name]}\n"
+
+    def create_var(self, var_name):
+        self.Variables[var_name] = self.Variables['number_of_vars']
+        self.Variables['number_of_vars'] += 1
+        self.has_changed_since_load = True

@@ -9,9 +9,56 @@ class CalcParser(Parser):
     precedence = (
         ('left', MORETHAN, LESSTHAN, MOREOREQUALTHAN, LESSOREQUALTHAN, EQUAL, NOTEQUAL),
         ('left', PLUS, MINUS),
-        ('left', TIMES, DIVIDE)
+        ('left', TIMES, DIVIDE, MOD)
     )
+    @_('procedures program')
+    def program_all(self, p):
+        return {'procedures': p.procedures, 'program' : p.program}
 
+    @_('program')
+    def program_all(self, p):
+        return {'procedures': None, 'program' : p.program}
+
+    @_('procedures PROCEDURE proc_head IS declarations BEGIN statements END')
+    def procedures(self, p):
+        return p.procedures + [{"type" : "procedure", "declarations" : p.declarations, "body": p.statements, "head" : p.proc_head, 'lineno':p.lineno}]
+
+    @_('procedures PROCEDURE proc_head IS BEGIN statements END')
+    def procedures(self, p):
+        return p.procedures + [{"type" : "procedure", "declarations" : p.declarations, "body": p.statements, "head" : None, 'lineno':p.lineno}]
+
+    @_('PROCEDURE proc_head IS declarations BEGIN statements END')
+    def procedures(self, p):
+        return [{"type" : "procedure", "declarations" : p.declarations, "body": p.statements, "head" : p.proc_head, 'lineno':p.lineno}]
+
+    @_('PROCEDURE proc_head IS BEGIN statements END')
+    def procedures(self, p):
+        return [{"type" : "procedure", "declarations" : p.declarations, "body": p.statements, "head" : None, 'lineno':p.lineno}]
+
+
+    @_('IDENTIFIER LPAREN args_decl RPAREN')
+    def proc_head(self, p):
+        return {"type": "proc_head", "name" : p.IDENTIFIER, "args": p.args_decl, 'lineno':p.lineno}
+
+    @_('IDENTIFIER LPAREN RPAREN')
+    def proc_head(self, p):
+        return {"type": "proc_head", "name": p.IDENTIFIER, "args": None, 'lineno':p.lineno}
+
+    @_('args_decl COMMA IDENTIFIER')
+    def args_decl(self, p):
+        return p.args_decl + [{"type": "var", "name" : p.IDENTIFIER, 'lineno':p.lineno}]
+
+    @_('args_decl COMMA T IDENTIFIER')
+    def args_decl(self, p):
+        return p.args_decl + [{"type": "tab", "name": p.IDENTIFIER, 'lineno':p.lineno}]
+
+    @_('IDENTIFIER')
+    def args_decl(self, p):
+        return [{"type": "var", "name" : p.IDENTIFIER, 'lineno':p.lineno}]
+
+    @_('T IDENTIFIER')
+    def args_decl(self, p):
+        return [{"type": "tab", "name": p.IDENTIFIER, 'lineno':p.lineno}]
     # Program główny
     @_('PROGRAM IS declarations BEGIN statements END')
     def program(self, p):
@@ -51,6 +98,7 @@ class CalcParser(Parser):
     def declarations(self, p):
         return [{"type": "variable", "name" : p.IDENTIFIER, 'lineno':p.lineno}]  # Tylko jedna zmienna
 
+
     # Instrukcje
     @_('statements statement')
     def statements(self, p):
@@ -61,10 +109,27 @@ class CalcParser(Parser):
         print("if statment read")
         return {'type' : 'if', 'check' : p.check, 'body' : p.statements0, 'else' : p.statements1, 'lineno':p.lineno}
 
+
     @_('IF check THEN statements ENDIF')
     def statement(self, p):
         print("if statment read")
         return {'type': 'if', 'check': p.check, 'body': p.statements, 'else': None, 'lineno':p.lineno}
+
+    @_('WHILE check DO statements ENDWHILE')
+    def statement(self, p):
+        return {'type': 'loop', 'loop_type' : 'while', 'body': p.statements, 'lineno':p.lineno, 'check': p.check}
+
+    @_('REPEAT statements UNTIL check')
+    def statement(self, p):
+        return {'type': 'loop', 'loop_type' : 'repeat', 'body': p.statements, 'lineno':p.lineno, 'check': p.check}
+
+    @_('FOR IDENTIFIER FROM factor DOWNTO factor DO statements ENDFOR')
+    def statement(self, p):
+        return {'type': 'loop', 'loop_type' : 'for', 'for_loop_type' : 'DOWNTO', 'body': p.statements, 'lineno':p.lineno, 'start': p.factor0, 'end': p.factor1, "iterator" : p.IDENTIFIER}
+
+    @_('FOR IDENTIFIER FROM factor TO factor DO statements ENDFOR')
+    def statement(self, p):
+        return {'type': 'loop', 'loop_type' : 'for', 'for_loop_type' : 'TO', 'body': p.statements, 'lineno':p.lineno, 'start': p.factor0, 'end': p.factor1, "iterator" : p.IDENTIFIER}
 
     @_('statement')
     def statements(self, p):
@@ -73,21 +138,21 @@ class CalcParser(Parser):
 
     @_('IDENTIFIER LTABPAREN expression RTABPAREN ASSIGN expression SEMICOLON')
     def statement(self, p):
-        return {'type': 'assignment', 'variable': p.IDENTIFIER, 'variable_type': 'table' ,'value': p.expression1, 'lineno':p.lineno, 'indeks' : p.expression0}
+        return {'type': 'assignment', 'variable': {"type": "variable", "name" : p.IDENTIFIER, 'lineno':p.lineno}, 'variable_type': 'table' ,'value': p.expression1, 'lineno':p.lineno, 'indeks' : p.expression0}
 
 
 
     # Przypisanie zmiennej
     @_('IDENTIFIER ASSIGN expression SEMICOLON')
     def statement(self, p):
-        return {'type': 'assignment', 'variable': p.IDENTIFIER, 'variable_type': 'variable' ,'value': p.expression, 'lineno':p.lineno}
+        return {'type': 'assignment', 'variable': {"type": "variable", "name" : p.IDENTIFIER, 'lineno':p.lineno}, 'variable_type': 'variable' ,'value': p.expression, 'lineno':p.lineno}
 
 
     # Instrukcja odczytu
     @_('READ IDENTIFIER SEMICOLON')
     def statement(self, p):
 
-        return {'type': 'read', 'variable': p.IDENTIFIER, 'lineno':p.lineno}
+        return {'type': 'read', 'variable': {"type": "variable", "name" : p.IDENTIFIER, 'lineno':p.lineno}, 'lineno':p.lineno}
 
     # Instrukcja wypisania
     @_('WRITE expression SEMICOLON')
@@ -153,6 +218,10 @@ class CalcParser(Parser):
     @_('term DIVIDE factor')
     def term(self, p):
         return {'type': 'expression', 'left': p.term, 'operator': '/', 'right': p.factor, 'lineno': p.lineno}
+
+    @_('term MOD factor')
+    def term(self, p):
+        return {'type': 'expression', 'left': p.term, 'operator': '%', 'right': p.factor, 'lineno': p.lineno}
 
     @_('factor')
     def term(self, p):

@@ -1,8 +1,6 @@
+
 PROGRAM IS
 a, b, y
 BEGIN
-    IF a > 0 THEN
-        a := 0;
-        b := 5;
-    ENDIF
+    a := b + 5;
 END
