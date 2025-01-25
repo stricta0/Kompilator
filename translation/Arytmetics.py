@@ -53,10 +53,13 @@ class Arytmetic:
         comand += self.comparision.comparison_type_solve(comparision_statment["operator"])
         return comand
 
-    def custom_comparisone_of_vars(self, var1, var2, comparisone_type):
+    def custom_comparisone_of_vars(self, var1, var2, comparisone_type, is_given_var_names=False):
         comand = ""
-        self.register.check_if_variable_exists(var1)
-        self.register.check_if_variable_exists(var2)
+        if is_given_var_names:
+            self.register.check_if_variable_exists(var1)
+            self.register.check_if_variable_exists(var2)
+            var1 = self.Variables[var1]
+            var2 = self.Variables[var2]
         comand += self.register.load_var_number(var1)
         comand += self.register.sub(var2)
         comand += self.comparision.comparison_type_solve(comparisone_type)

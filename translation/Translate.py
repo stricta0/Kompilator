@@ -11,7 +11,7 @@ class Translator:
         #only execption is Variables["reg"] witch contains a var thats currently in register
         #and infor if it was changed thruout the program
         self.Variables = {}
-        self.Variables["number_of_vars"] =  {"number": 1, "pointer":False}
+        self.Variables["number_of_vars"] = 1
         self.decripted = ""
         self.register = Register(self.Variables)
         self.arytmetic = Arytmetic(self.Variables, self.register)
@@ -52,21 +52,22 @@ class Translator:
     #nie musimy tworzyć zmiennych w kodzie - wystarczy zapamiętać gdzie
     #jaka zmienna się znajduje a potem korzystać z tych "adresów"
     def declaration(self, variabouls):
-        self.Variables["number_of_vars"] = {"number": 1, "pointer":False}
+        self.Variables["number_of_vars"] = 1
         comand = ""
         for var_element in variabouls:
             if var_element["type"] == "variable":
                 var = var_element["name"]
                 self.Variables[var] = self.Variables["number_of_vars"]
-                self.Variables["number_of_vars"]["number"] += 1
+                self.Variables["number_of_vars"] += 1
             if var_element["type"] == "table":
                 table_name = var_element["name"]
                 line_no = var_element["lineno"]
                 start = var_element["range"]["start"]
                 end = var_element["range"]["end"]
                 comand += self.systemic.create_tab(table_name, start, end, line_no)
+        self.Variables["reg"] = 0
         self.Variables["_helper"] = self.Variables["number_of_vars"]
-        self.Variables["number_of_vars"]["number"] += 1
+        self.Variables["number_of_vars"] += 1
         self.decripted += comand
 
 

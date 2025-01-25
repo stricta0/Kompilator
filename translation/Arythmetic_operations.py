@@ -10,7 +10,7 @@ class ArythmeticOperations:
         #If left side is just a var there is no need to save load and save it somewere else
         if left_token['type'] == 'identifier':
             self.register.check_if_variable_exists(left_token['name'])
-            x = self.Variables[left_token['name']]["number"]
+            x = self.Variables[left_token['name']]
         else:
             comand += left #calc left side
             line, x = self.register.store_helper_multiple_vars()
@@ -29,7 +29,7 @@ class ArythmeticOperations:
 
         if right_token['type'] == 'identifier':
             self.register.check_if_variable_exists(right_token['name'])
-            x = self.Variables[right_token['name']]["number"]
+            x = self.Variables[right_token['name']]
         else:
             comand += right #calc right side
             line, x = self.register.store_helper_multiple_vars()

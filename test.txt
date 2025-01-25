@@ -1,6 +1,16 @@
+PROCEDURE first(T a, b) IS
+    x, y
+BEGIN
+    x := 5;
+    y := 7;
+END
 
 PROGRAM IS
 a, b, y
 BEGIN
-    a := b + 5;
+    a := 10;
+    FOR i FROM 10 TO 20 DO
+        a := 15;
+    ENDFOR
+    b := a * 5 + 5;
 END
