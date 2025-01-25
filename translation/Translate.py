@@ -11,7 +11,8 @@ class Translator:
         #only execption is Variables["reg"] witch contains a var thats currently in register
         #and infor if it was changed thruout the program
         self.Variables = {}
-        self.Variables["number_of_vars"] = 1
+        self.Variables["0_number_of_vars"] = 1
+        self.Variables["0_reg"] = 0
         self.decripted = ""
         self.register = Register(self.Variables)
         self.arytmetic = Arytmetic(self.Variables, self.register)
@@ -29,11 +30,12 @@ class Translator:
     def translate_main(self, main):
         self.declaration(main["declarations"])
         self.decripted += self.statements(main["statements"])
-
-
-
-
-
+#{"type" : "procedure", "declarations" : p.declarations, "body": p.statements, "head" : p.proc_head, 'lineno':p.lineno}
+#return {"type": "proc_head", "name" : p.IDENTIFIER, "args": p.args_decl, 'lineno':p.lineno}
+    def translate_procedure(self, procedure):
+        decla = procedure["declarations"]
+        body= procedure["body"]
+        args = procedure["head"]["args"]
 
 
     def end_file_changes(self):
@@ -52,22 +54,22 @@ class Translator:
     #nie musimy tworzyć zmiennych w kodzie - wystarczy zapamiętać gdzie
     #jaka zmienna się znajduje a potem korzystać z tych "adresów"
     def declaration(self, variabouls):
-        self.Variables["number_of_vars"] = 1
+        self.Variables["0_number_of_vars"] = 1
         comand = ""
         for var_element in variabouls:
             if var_element["type"] == "variable":
                 var = var_element["name"]
-                self.Variables[var] = self.Variables["number_of_vars"]
-                self.Variables["number_of_vars"] += 1
+                self.Variables[var] = self.Variables["0_number_of_vars"]
+                self.Variables["0_number_of_vars"] += 1
             if var_element["type"] == "table":
                 table_name = var_element["name"]
                 line_no = var_element["lineno"]
                 start = var_element["range"]["start"]
                 end = var_element["range"]["end"]
                 comand += self.systemic.create_tab(table_name, start, end, line_no)
-        self.Variables["reg"] = 0
-        self.Variables["_helper"] = self.Variables["number_of_vars"]
-        self.Variables["number_of_vars"] += 1
+        self.Variables["0_reg"] = 0
+        self.Variables["_helper"] = self.Variables["0_number_of_vars"]
+        self.Variables["0_number_of_vars"] += 1
         self.decripted += comand
 
 
@@ -106,7 +108,7 @@ class Translator:
                     line_h, helper = self.systemic.store_tab_addres_in__helper(statement["variable"])
                     line +=  line_h #_helper = faktyczne i (adres tab[i] w vm)
                     line += self.value_loader.save_value_from_statement_in_reg(statement["value"]) #reg = value po prawej od znaku :=
-                    line += self.register.store_i_var_number(helper) #adres który jest pod _helper (czyli adres tab[i]) = reg
+                    line += self.register.store_i_var(helper) #adres który jest pod _helper (czyli adres tab[i]) = reg
 
 
             code += line

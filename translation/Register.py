@@ -8,9 +8,10 @@ class Register:
         self.Variables = Variables
         self.lineno = 0
         self.bool_exists = False
-        self.zero_indeks = None
-        self.one_indeks = None
+        self.zero_element = None
+        self.one_element = None
         self.mark_zone = 0
+        self.new_value_ind = 2
 
 
     def check_if_variable_exists(self, var):
@@ -19,6 +20,7 @@ class Register:
 
 
     def load_var(self, var):
+
         self.check_if_variable_exists(var)
         if not self.has_changed_since_load and self.last_loaded_var_no == self.Variables[var]:
             return "" #already loaded
@@ -27,13 +29,13 @@ class Register:
             self.last_loaded_var_no = self.Variables[var]
             return f"LOAD {self.Variables[var]}\n"
 
-    def load_var_number(self, var_no):
-        if not self.has_changed_since_load and self.last_loaded_var_no == var_no:
-            return "" #already loaded
-        else:
-            self.has_changed_since_load = False
-            self.last_loaded_var_no = var_no
-            return f"LOAD {var_no}\n"
+    # def load_var_number(self, var_no):
+    #     if not self.has_changed_since_load and self.last_loaded_var_no == var_no:
+    #         return "" #already loaded
+    #     else:
+    #         self.has_changed_since_load = False
+    #         self.last_loaded_var_no = var_no
+    #         return f"LOAD {var_no}\n"
 
     def store(self, var):
         print("SOME COMMMAND 10")
@@ -41,21 +43,25 @@ class Register:
         self.has_changed_since_load = True #Somthing else changed the value
         return f"STORE {self.Variables[var]}\n"
 
-    def store_number_var(self, var):
-        print("SOME COMMMAND 11")
-        self.has_changed_since_load = True #Somthing else changed the value
-        return f"STORE {var}\n"
+    # def store_number_var(self, var):
+    #     print("SOME COMMMAND 11")
+    #     self.has_changed_since_load = True #Somthing else changed the value
+    #     return f"STORE {var}\n"
 
 
     def store_helper_multiple_vars(self):
-        number_of_var = self.Variables['number_of_vars']
-        self.Variables['number_of_vars'] += 1
-        return f"STORE {number_of_var}\n", number_of_var
+        number_of_var = self.Variables['0_number_of_vars']
+        self.Variables['0_number_of_vars'] += 1
+        self.Variables[f"_{self.new_value_ind}"] = number_of_var
+        self.new_value_ind += 1
+        return f"STORE {number_of_var}\n", f"_{self.new_value_ind-1}"
 
     def create_var_but_dont_store(self):
-        number_of_var = self.Variables['number_of_vars']
-        self.Variables['number_of_vars'] += 1
-        return number_of_var
+        number_of_var = self.Variables['0_number_of_vars']
+        self.Variables['0_number_of_vars'] += 1
+        self.Variables[f"_{self.new_value_ind}"] = number_of_var
+        self.new_value_ind += 1
+        return f"_{self.new_value_ind-1}"
 
     def add_var(self, var):
         print("SOME COMMMAND 9")
@@ -63,10 +69,10 @@ class Register:
         self.has_changed_since_load = True
         return f"ADD {self.Variables[var]}\n"
 
-    def add(self, var_no):
-        print("SOME COMMMAND 8")
-        self.has_changed_since_load = True
-        return f"ADD {var_no}\n"
+    # def add(self, var_no):
+    #     print("SOME COMMMAND 8")
+    #     self.has_changed_since_load = True
+    #     return f"ADD {var_no}\n"
 
     def sub_var(self, var):
         print("SOME COMMMAND 7")
@@ -74,18 +80,18 @@ class Register:
         self.has_changed_since_load = True
         return f"SUB {self.Variables[var]}\n"
 
-    def sub(self, var_no):
-        print("SOME COMMMAND 6")
-        self.has_changed_since_load = True
-        return f"SUB {var_no}\n"
+    # def sub(self, var_no):
+    #     print("SOME COMMMAND 6")
+    #     self.has_changed_since_load = True
+    #     return f"SUB {var_no}\n"
 
     def set_comand(self, x):
         print("SOME COMMMAND 5")
         self.has_changed_since_load = True
         return f"SET {x}\n"
 
-    def put(self, i):
-        return f"PUT {i}\n"
+    # def put(self, i):
+    #     return f"PUT {i}\n"
 
     def put_var(self, var_name):
         self.check_if_variable_exists(var_name)
@@ -97,9 +103,9 @@ class Register:
         return f"GET {self.Variables[i]}\n"
 
 
-    def go_back_to_last_reg(self):
-        self.has_changed_since_load = False
-        return f"LOAD {self.last_loaded_var_no}\n"
+    # def go_back_to_last_reg(self):
+    #     self.has_changed_since_load = False
+    #     return f"LOAD {self.last_loaded_var_no}\n"
 
     def make_0_and_1_if_dont_exist_already(self):
         if self.bool_exists:
@@ -107,10 +113,10 @@ class Register:
         self.bool_exists = True
         comand = ""
         comand += self.set_comand(0)
-        line, self.zero_indeks = self.store_helper_multiple_vars()
+        line, self.zero_element = self.store_helper_multiple_vars()
         comand += line
         comand += self.set_comand(1)
-        line, self.one_indeks = self.store_helper_multiple_vars()
+        line, self.one_element= self.store_helper_multiple_vars()
         comand += line
         return comand
 
@@ -148,9 +154,9 @@ class Register:
     def new_marks(self):
         self.mark_zone += 1
 
-    def load_i_var_number(self, val):
-        self.has_changed_since_load = True
-        return f"LOADI {val}\n"
+    # def load_i_var_number(self, val):
+    #     self.has_changed_since_load = True
+    #     return f"LOADI {val}\n"
 
     def load_i_var(self, val):
         self.check_if_variable_exists(val)
@@ -158,9 +164,9 @@ class Register:
         return f"LOADI {self.Variables[val]}\n"
 
 
-    def store_i_var_number(self, val):
-        self.has_changed_since_load = True
-        return f"STOREI {val}\n"
+    # def store_i_var_number(self, val):
+    #     self.has_changed_since_load = True
+    #     return f"STOREI {val}\n"
 
 
     def store_i_var(self, var_name):
@@ -169,6 +175,6 @@ class Register:
         return f"STOREI {self.Variables[var_name]}\n"
 
     def create_var(self, var_name):
-        self.Variables[var_name] = self.Variables['number_of_vars']
-        self.Variables['number_of_vars'] += 1
+        self.Variables[var_name] = self.Variables['0_number_of_vars']
+        self.Variables['0_number_of_vars'] += 1
         self.has_changed_since_load = True

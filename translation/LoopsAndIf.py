@@ -29,34 +29,39 @@ class LoopsAndIf:
 
     def loop_statement(self, statement, body, full_statement):
         if statement["loop_type"] == "for":
+            print("for started")
             self.look_for_iterator_change_in_body(full_statement)
             line = self.register.make_0_and_1_if_dont_exist_already()
-
+            print("for started2")
             iterator = statement["iterator"]
             self.register.create_var(iterator)
             line += self.value_loader.save_value_from_statement_in_reg(statement["start"])
             line += self.register.store(iterator) #iterator = start
+            print("for started3")
             line += self.value_loader.save_value_from_statement_in_reg(statement["end"])
             line_l, i_end = self.register.store_helper_multiple_vars()
             line += line_l #i_end = end
-
+            print("for started4")
 
 
             if statement["for_loop_type"] == "TO":
                 #first, check if start<=end
                 line += self.register.add_mark("LoopStart")
-                line += self.arytmetic.custom_comparisone_of_vars(self.Variables[iterator], i_end, "<=") #comp
+                print("for started5")
+                line += self.arytmetic.custom_comparisone_of_vars(iterator, i_end, "<=") #comp
+                print("for started6")
                 line += self.register.marked_jump("LoopEnd", "JZERO")
                 line += self.register.load_var(iterator)
-                line += self.register.add(self.register.one_indeks)
+
+                line += self.register.add_var(self.register.one_element)
                 line += body
 
             if statement["for_loop_type"] == "DOWNTO":
                 line += self.register.add_mark("LoopStart")
-                line += self.arytmetic.custom_comparisone_of_vars(self.Variables[iterator], i_end, ">=")
+                line += self.arytmetic.custom_comparisone_of_vars(iterator, i_end, ">=")
                 line += self.register.marked_jump("LoopEnd", "JZERO")
                 line += self.register.load_var(iterator)
-                line += self.register.sub(self.register.one_indeks)
+                line += self.register.sub_var(self.register.one_element)
 
             line += body
             line += self.register.marked_jump("LoopStart", "JUMP")

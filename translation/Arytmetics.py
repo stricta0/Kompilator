@@ -49,19 +49,18 @@ class Arytmetic:
         comand += line #right_val = right
         left = self.value_loader(comparision_statment["left"]) #reg = left
         comand += left
-        comand += self.register.sub(right_val) #reg = left - right
+        comand += self.register.sub_var(right_val) #reg = left - right
         comand += self.comparision.comparison_type_solve(comparision_statment["operator"])
         return comand
 
-    def custom_comparisone_of_vars(self, var1, var2, comparisone_type, is_given_var_names=False):
+    def custom_comparisone_of_vars(self, var1, var2, comparisone_type):
+
         comand = ""
-        if is_given_var_names:
-            self.register.check_if_variable_exists(var1)
-            self.register.check_if_variable_exists(var2)
-            var1 = self.Variables[var1]
-            var2 = self.Variables[var2]
-        comand += self.register.load_var_number(var1)
-        comand += self.register.sub(var2)
+        self.register.check_if_variable_exists(var1)
+        print("hm??")
+        self.register.check_if_variable_exists(var2)
+        comand += self.register.load_var(var1)
+        comand += self.register.sub_var(var2)
         comand += self.comparision.comparison_type_solve(comparisone_type)
         return comand
 

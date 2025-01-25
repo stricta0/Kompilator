@@ -8,9 +8,10 @@ END
 PROGRAM IS
 a, b, y
 BEGIN
-    a := 10;
-    FOR i FROM 10 TO 20 DO
-        a := 15;
-    ENDFOR
-    b := a * 5 + 5;
+    IF a > b THEN
+        a := 4;
+    ELSE
+        a := 5;
+    ENDIF
+
 END

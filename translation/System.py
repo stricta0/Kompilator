@@ -16,7 +16,7 @@ class Systemic:
     def write_number(self, statement):
         value = statement["value"]
         comand = self.register.set_comand(value)
-        comand += self.register.put_var("reg")
+        comand += self.register.put_var("0_reg")
         return comand
 
     #we assume that reg = i
@@ -47,11 +47,11 @@ class Systemic:
         comand  = ""
         comand += self.register.set_comand(-start) #reg = start
 
-        line, self.Variables[tab_name] = self.register.store_helper_multiple_vars()  #tab_name przechowuje start indeks tablicy
-
+        line, help_= self.register.store_helper_multiple_vars()  #tab_name przechowuje start indeks tablicy
+        self.Variables[tab_name] = self.Variables[help_]
         comand += line #self.Variabels[tab_name] = start
         comand += self.register.set_comand(self.Variables[tab_name] + 2) #ten jest +1 - kolejny - czyli pierwszy w tablicy - +2 #reg = indeks pierwszego elementu tablicy (przyda sie zamiast seta robic za kazdym razem bo jest drozszy)
-        comand += self.register.add(self.Variables[tab_name]) #new
+        comand += self.register.add_var(tab_name) #new
         comand += self.register.store(tab_name) #new| tab_name przechowuje wartości -> -start + adres tab[0]
         #line, tab_0 = self.register.store_helper_multiple_vars()
         #comand += line
@@ -63,10 +63,9 @@ class Systemic:
     #get statement of varible of type variable_type (tab[3] for example)
     #and returns real indeks of tab[3] in vm
     def get_real_table_variable_indeks(self, tab_name): #reg = i
-        indeks_of_element_with_start_val = self.Variables[tab_name]
         #indeks_zero = indeks_of_element_with_start_val + 1  # indeks pierwszego elememntu tablicy (tab[0])
         comand = ""
-        comand += self.register.add(indeks_of_element_with_start_val)  # reg = i - start
+        comand += self.register.add_var(tab_name)  # reg = i - start
         #comand += self.register.add(indeks_zero)  # reg = i - start + adres_tab[0] - mam nadzieje ze dziala xd
         return comand
 
@@ -80,5 +79,5 @@ class Systemic:
 
     def load_tab_i(self, tab_name): #LOAD
         comand, helper = self.store_tab_addres_in__helper(tab_name)
-        comand += self.register.load_i_var_number(helper)
+        comand += self.register.load_i_var(helper)
         return comand
