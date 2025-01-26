@@ -83,12 +83,14 @@ class ArythmeticOperations:
         #robic teraz
 
         #poczatek petli
+        comand += self.register.add_mark("Begin_loop")
         comand += self.register.load_var(self.register.one_element)
         comand += self.register.store(power) #power = 1
         comand += self.register.load_var(b) #reg = b
+        comand += self.register.add_mark("Begin_1_loop")
         comand += self.register.sub_var(a) #reg = b - a
-        comand += self.register.jneg(8) #if b - a < 0 : zakoncz petle
-
+        #comand += self.register.jneg(8) #if b - a < 0 : zakoncz petle
+        comand += self.register.marked_jump("End_1_loop", "JNEG")
         #cialo petli while b < a
         comand += self.register.load_var(power) #reg = power
         comand += self.register.add_var(power) #reg = 2power
@@ -98,7 +100,9 @@ class ArythmeticOperations:
         comand += self.register.add_var(b) #reg = 2b
         comand += self.register.store(b) #b = 2b
 
-        comand += self.register.jump(-8) #wroc do poczatku petli
+        #comand += self.register.jump(-8) #wroc do poczatku petli
+        comand += self.register.marked_jump("Begin_1_loop", "JUMP")
+        comand += self.register.add_mark("End_1_loop")
         #koniec petli while b < a
         comand += self.register.load_var(b) # reg = b
         comand += self.register.sub_var(a) #reg = b - a
@@ -106,7 +110,7 @@ class ArythmeticOperations:
         comand += self.register.jump(4) #else
         comand += self.register.load_var(power) #reg = power
         comand += self.register.add_var(save_power) # reg = power + save_power
-        comand += self.register.jump(15) #end - koniec dzielenia
+        comand += self.register.marked_jump("END", "JUMP") #end - koniec dzielenia
         comand += self.register.load_var(power)
         comand += self.register.half()
         comand += self.register.store(power) #power = power // 2
@@ -119,7 +123,8 @@ class ArythmeticOperations:
         comand += self.register.store(b) #b = old_b
         comand += self.register.sub_var(a) #reg = b - a
         comand += self.register.jpos(2) #if b > a - zakoncz program
-        comand += self.register.jump(-31) #else wroc do petli
+        #comand += self.register.jump(-31) #else wroc do petli
+        comand += self.register.marked_jump("Begin_loop", "JUMP")
         comand += self.register.load_var(save_power) #reg = save_power (wynik)
         comand += self.register.add_mark("END")
         self.register.new_marks() #dont use the same markers next time
@@ -224,6 +229,7 @@ class ArythmeticOperations:
             comand += self.register.store(a) #a = -a 3 ostatnie linijki
 
             #reg = a - poczatek petli
+            comand += self.register.add_mark("BeginLop")
             comand += self.register.half() # reg = a//2
             comand += self.register.add_var("0_reg") # reg = a//2 + a//2
             comand += self.register.sub_var(a) #reg = a//2 * 2 - a #0 - parzyste, -1 nieparzyste
@@ -237,7 +243,8 @@ class ArythmeticOperations:
             comand += self.register.load_var(a) #reg = a
             comand += self.register.half() #reg = a//2
             comand += self.register.store(a) #a = a//2
-            comand += self.register.jpos(-13) #jesli a>0 - wroc do poczatku petli
+            #comand += self.register.jpos(-13) #jesli a>0 - wroc do poczatku petli
+            comand += self.register.marked_jump("BeginLop", "JPOS")
 
             #comand += self.register.load_var_number(wynik) #reg = wynik
             comand += self.register.load_var(wynik_is_ujemny) #reg = wynik_is_ujemny
@@ -246,7 +253,7 @@ class ArythmeticOperations:
             comand += self.register.sub_var(wynik) #0 - wynik = -wynik
             comand += self.register.jump(2)
             comand += self.register.load_var(wynik) # = wynik
-
+            self.register.new_marks()
             return comand
 
 

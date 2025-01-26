@@ -1,17 +1,17 @@
-PROCEDURE first(T a, b) IS
-    x, y
+PROCEDURE fun(a) IS
+x,y
 BEGIN
-    x := 5;
-    y := 7;
+    a := 3;
+    x := 1;
+    y := 2;
 END
 
 PROGRAM IS
 a, b, y
 BEGIN
-    IF a > b THEN
-        a := 4;
-    ELSE
-        a := 5;
-    ENDIF
-
+    a := 1;
+    b := 2;
+    y := 3;
+    fun(b, y, a);
+    fun(y);
 END

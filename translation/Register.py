@@ -12,7 +12,26 @@ class Register:
         self.one_element = None
         self.mark_zone = 0
         self.new_value_ind = 2
+        self.pointer_vars = []
 
+
+    def set_Variables(self, Variabels):
+        self.Variables.clear()
+        print(f"Variables got by set_variables: {Variabels}" )
+        for key in Variabels:
+            self.Variables[key] = Variabels[key]
+
+    def add_to_pointers(self, pointers):
+        self.pointer_vars += pointers
+
+    def set_pointer_vars(self, pointers):
+        self.pointer_vars = pointers.copy()
+
+    def clear_pointers(self):
+        self.pointer_vars.clear()
+
+    def check_if_pointer(self, var):
+        return var in self.pointer_vars
 
     def check_if_variable_exists(self, var):
         if var not in self.Variables:
@@ -27,26 +46,17 @@ class Register:
         else:
             self.has_changed_since_load = False
             self.last_loaded_var_no = self.Variables[var]
+            if self.check_if_pointer(var):
+                return f"LOADI {self.Variables[var]}\n"
             return f"LOAD {self.Variables[var]}\n"
-
-    # def load_var_number(self, var_no):
-    #     if not self.has_changed_since_load and self.last_loaded_var_no == var_no:
-    #         return "" #already loaded
-    #     else:
-    #         self.has_changed_since_load = False
-    #         self.last_loaded_var_no = var_no
-    #         return f"LOAD {var_no}\n"
 
     def store(self, var):
         print("SOME COMMMAND 10")
         self.check_if_variable_exists(var)
         self.has_changed_since_load = True #Somthing else changed the value
+        if self.check_if_pointer(var):
+            return f"STOREI {self.Variables[var]}\n"
         return f"STORE {self.Variables[var]}\n"
-
-    # def store_number_var(self, var):
-    #     print("SOME COMMMAND 11")
-    #     self.has_changed_since_load = True #Somthing else changed the value
-    #     return f"STORE {var}\n"
 
 
     def store_helper_multiple_vars(self):
@@ -54,6 +64,7 @@ class Register:
         self.Variables['0_number_of_vars'] += 1
         self.Variables[f"_{self.new_value_ind}"] = number_of_var
         self.new_value_ind += 1
+
         return f"STORE {number_of_var}\n", f"_{self.new_value_ind-1}"
 
     def create_var_but_dont_store(self):
@@ -67,45 +78,36 @@ class Register:
         print("SOME COMMMAND 9")
         self.check_if_variable_exists(var)
         self.has_changed_since_load = True
+        if self.check_if_pointer(var):
+            return f"ADDI {self.Variables[var]}\n"
         return f"ADD {self.Variables[var]}\n"
-
-    # def add(self, var_no):
-    #     print("SOME COMMMAND 8")
-    #     self.has_changed_since_load = True
-    #     return f"ADD {var_no}\n"
 
     def sub_var(self, var):
         print("SOME COMMMAND 7")
         self.check_if_variable_exists(var)
         self.has_changed_since_load = True
+        if self.check_if_pointer(var):
+            return f"SUBI {self.Variables[var]}\n"
         return f"SUB {self.Variables[var]}\n"
-
-    # def sub(self, var_no):
-    #     print("SOME COMMMAND 6")
-    #     self.has_changed_since_load = True
-    #     return f"SUB {var_no}\n"
 
     def set_comand(self, x):
         print("SOME COMMMAND 5")
         self.has_changed_since_load = True
         return f"SET {x}\n"
 
-    # def put(self, i):
-    #     return f"PUT {i}\n"
-
     def put_var(self, var_name):
         self.check_if_variable_exists(var_name)
+        if self.check_if_pointer(var_name):
+            return f"LOADI {self.Variables[var_name]}\nPUT {self.Variables["0_reg"]}"
         return f"PUT {self.Variables[var_name]}\n"
 
     def get_comand(self, i):
         self.check_if_variable_exists(i)
         self.has_changed_since_load = True
+        if self.check_if_pointer(i):
+            return f"GET {self.Variables["0_reg"]}\nSTOREI {self.Variables[i]}"
         return f"GET {self.Variables[i]}\n"
 
-
-    # def go_back_to_last_reg(self):
-    #     self.has_changed_since_load = False
-    #     return f"LOAD {self.last_loaded_var_no}\n"
 
     def make_0_and_1_if_dont_exist_already(self):
         if self.bool_exists:
@@ -154,19 +156,10 @@ class Register:
     def new_marks(self):
         self.mark_zone += 1
 
-    # def load_i_var_number(self, val):
-    #     self.has_changed_since_load = True
-    #     return f"LOADI {val}\n"
-
     def load_i_var(self, val):
         self.check_if_variable_exists(val)
         self.has_changed_since_load = True
         return f"LOADI {self.Variables[val]}\n"
-
-
-    # def store_i_var_number(self, val):
-    #     self.has_changed_since_load = True
-    #     return f"STOREI {val}\n"
 
 
     def store_i_var(self, var_name):

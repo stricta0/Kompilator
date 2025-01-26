@@ -50,8 +50,8 @@ def mod(a, b):
         b = old_b
         if b > a:
             return a
-
-for i in range(1000):
-    for j in range(1, 1000):
-        if i % j != mod(i, j):
-            print(f"zle i:{i}, j:{j}, i%j:{i%j}, mod(i,j):{mod(i,j)}")
+tab1 = [1,2,3]
+tab3 = [4,5,6]
+tab2 = tab1
+tab2.clear()
+print(tab1)

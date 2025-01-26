@@ -25,7 +25,7 @@ class CalcParser(Parser):
 
     @_('procedures PROCEDURE proc_head IS BEGIN statements END')
     def procedures(self, p):
-        return p.procedures + [{"type" : "procedure", "declarations" : p.declarations, "body": p.statements, "head" : None, 'lineno':p.lineno}]
+        return p.procedures + [{"type" : "procedure", "declarations" : [], "body": p.statements, "head" : p.proc_head, 'lineno':p.lineno}]
 
     @_('PROCEDURE proc_head IS declarations BEGIN statements END')
     def procedures(self, p):
@@ -33,7 +33,7 @@ class CalcParser(Parser):
 
     @_('PROCEDURE proc_head IS BEGIN statements END')
     def procedures(self, p):
-        return [{"type" : "procedure", "declarations" : p.declarations, "body": p.statements, "head" : None, 'lineno':p.lineno}]
+        return [{"type" : "procedure", "declarations" : [], "body": p.statements, "head" : p.proc_head, 'lineno':p.lineno}]
 
 
     @_('IDENTIFIER LPAREN args_decl RPAREN')
@@ -42,11 +42,11 @@ class CalcParser(Parser):
 
     @_('IDENTIFIER LPAREN RPAREN')
     def proc_head(self, p):
-        return {"type": "proc_head", "name": p.IDENTIFIER, "args": None, 'lineno':p.lineno}
+        return {"type": "proc_head", "name": p.IDENTIFIER, "args": [], 'lineno':p.lineno}
 
     @_('args_decl COMMA IDENTIFIER')
     def args_decl(self, p):
-        return p.args_decl + [{"type": "var", "name" : p.IDENTIFIER, 'lineno':p.lineno}]
+        return p.args_decl + [{"type": "variable", "name" : p.IDENTIFIER, 'lineno':p.lineno}]
 
     @_('args_decl COMMA T IDENTIFIER')
     def args_decl(self, p):
@@ -54,7 +54,7 @@ class CalcParser(Parser):
 
     @_('IDENTIFIER')
     def args_decl(self, p):
-        return [{"type": "var", "name" : p.IDENTIFIER, 'lineno':p.lineno}]
+        return [{"type": "variable", "name" : p.IDENTIFIER, 'lineno':p.lineno}]
 
     @_('T IDENTIFIER')
     def args_decl(self, p):
@@ -147,6 +147,34 @@ class CalcParser(Parser):
     def statement(self, p):
         return {'type': 'assignment', 'variable': {"type": "variable", "name" : p.IDENTIFIER, 'lineno':p.lineno}, 'variable_type': 'variable' ,'value': p.expression, 'lineno':p.lineno}
 
+
+
+    #PROC CALL
+    @_('IDENTIFIER LPAREN args_call RPAREN SEMICOLON')
+    def statement(self, p):
+        return {"type": "proc_call", "name" : p.IDENTIFIER, "args": p.args_call, 'lineno':p.lineno}
+
+    @_('IDENTIFIER LPAREN RPAREN SEMICOLON')
+    def statement(self, p):
+        return {"type": "proc_call", "name": p.IDENTIFIER, "args": [], 'lineno':p.lineno}
+
+    @_('args_call COMMA IDENTIFIER')
+    def args_call(self, p):
+        return p.args_call + [{"type": "variable", "name" : p.IDENTIFIER, 'lineno':p.lineno}]
+
+    @_('args_call COMMA T IDENTIFIER')
+    def args_call(self, p):
+        return p.args_call + [{"type": "tab", "name": p.IDENTIFIER, 'lineno':p.lineno}]
+
+    @_('IDENTIFIER')
+    def args_call(self, p):
+        return [{"type": "variable", "name" : p.IDENTIFIER, 'lineno':p.lineno}]
+
+    @_('T IDENTIFIER')
+    def args_call(self, p):
+        return [{"type": "tab", "name": p.IDENTIFIER, 'lineno':p.lineno}]
+
+    #END PROC CALL
 
     # Instrukcja odczytu
     @_('READ IDENTIFIER SEMICOLON')
