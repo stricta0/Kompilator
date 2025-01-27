@@ -1,17 +1,14 @@
-PROCEDURE fun(a) IS
+PROCEDURE fun(T a) IS
 x,y
 BEGIN
-    a := 3;
+    a[2] := 3;
     x := 1;
     y := 2;
 END
 
 PROGRAM IS
-a, b, y
+a, b, y, tab[0:10]
 BEGIN
-    a := 1;
-    b := 2;
-    y := 3;
-    fun(b, y, a);
-    fun(y);
+    tab[2] := 15;
+    fun(tab);
 END

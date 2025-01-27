@@ -1,7 +1,9 @@
+from sympy.codegen import Print
+from sympy.codegen.ast import Raise
 from torchgen.executorch.api.et_cpp import arguments
 
 from Errors_custom import ProcedureCreatedTwice, ProcedureDosntExist, VariableNotFoundError, \
-    ProcedureCalledWithWrongAmoutOfArguments
+    ProcedureCalledWithWrongAmoutOfArguments, VariableOfWrongType
 from translation import Arytmetic, Systemic, Register, EndOfFileChanges, ValueLoader, LoopsAndIf
 
 
@@ -13,6 +15,7 @@ class Translator:
         #only execption is Variables["reg"] witch contains a var thats currently in register
         #and infor if it was changed thruout the program
         self.Variables = {}
+        self.Variables_with_types = {}
         self.Variables["0_number_of_vars"] = 1
         self.Variables["0_reg"] = 0
         self.decripted = ""
@@ -33,6 +36,7 @@ class Translator:
         else:
             self.translate_procedures(procedures)
         self.translate_main(main)
+
         self.end_file_changes()
 
     def translate_main(self, main):
@@ -82,17 +86,22 @@ class Translator:
         vars_for_proc = {}
         vars_for_proc["0_number_of_vars"] = self.Variables["0_number_of_vars"]
         comand = ""
+        self.Variables_with_types.clear()
         for var_element in declarations:
             if var_element["type"] == "variable":
                 var = var_element["name"]
                 vars_for_proc[var] = vars_for_proc["0_number_of_vars"]
                 vars_for_proc["0_number_of_vars"] += 1
-            # if var_element["type"] == "table": #TODO: guess
-            #     table_name = var_element["name"]
-            #     line_no = var_element["lineno"]
-            #     start = var_element["range"]["start"]
-            #     end = var_element["range"]["end"]
-            #     comand += self.systemic.create_tab(table_name, start, end, line_no)
+                self.Variables_with_types[var] = "variable"
+            if var_element["type"] == "table":
+                table_name = var_element["name"]
+                line_no = var_element["lineno"]
+                start = var_element["range"]["start"]
+                end = var_element["range"]["end"]
+                line_to_add, var_in_table_name = self.systemic.create_tab_in_procedure(table_name, start, end, line_no)
+                comand += line_to_add
+                self.Variables_with_types[table_name] = "table"
+                vars_for_proc[table_name] = var_in_table_name
         vars_for_proc["0_reg"] = 0
         vars_for_proc["_helper"] = vars_for_proc["0_number_of_vars"]
         vars_for_proc["0_number_of_vars"] += 1
@@ -101,16 +110,45 @@ class Translator:
         for var_element in args:
             print("petla do dodawania argumentow zostala odpalona")
             print(var_element)
-            if var_element["type"] == "variable":
-                var = var_element["name"]
-                vars_for_proc[var] = vars_for_proc["0_number_of_vars"]
-                vars_for_proc["0_number_of_vars"] += 1
-                pointers.append(var)
+            var = var_element["name"]
+            vars_for_proc[var] = vars_for_proc["0_number_of_vars"]
+            vars_for_proc["0_number_of_vars"] += 1
+            pointers.append(var)
         return comand, vars_for_proc, pointers
 
+    def proc_call(self, statement):
+        code = ""
+        name = statement["name"]
+        args = statement["args"]
+        function_def_args = self.Variables_for_proc[f"0_Proc_{name}"]["pointers"] #names
+        if len(args) != len(function_def_args):
+            raise VariableNotFoundError(statement["lineno"], "Wrong amout of variables in call", "NONE")
+        for i in range(len(args)):
+            arg_in_call = args[i]
+            name_of_arg_in_call = arg_in_call["name"]
+            type_of_arg_in_call = arg_in_call["type"]
 
+            name_of_arg_in_def = function_def_args[i]
+            type_of_arg_in_def = self.Variables_with_types[name_of_arg_in_def]
+
+            if type_of_arg_in_def != type_of_arg_in_call:
+                raise VariableOfWrongType(statement["lineno"], f"type of variable {name_of_arg_in_call} in function call and variable {name_of_arg_in_def} differ", name_of_arg_in_call)
+
+            code += self.set_pair_of_vars_in_procedure_call_and_def(name_of_arg_in_call, name_of_arg_in_def, name)
+        print(f"NAME: {name}")
+        code += self.register.static_marked_jump(f"0_Proc_{name}", "JUMP")
+        return code
+
+    def set_pair_of_vars_in_procedure_call_and_def(self, name_of_arg_in_call, name_of_arg_in_def, function_name):
+        print(f"name_of_arg_in_call: {name_of_arg_in_call}, name_of_arg_in_def : {name_of_arg_in_def}, function_name: {function_name}")
+        code = ""
+        code += self.register.set_comand(self.Variables[name_of_arg_in_call])
+        code += self.register.store_indeks(self.Variables_for_proc[f"0_Proc_{function_name}"]["Variables"][name_of_arg_in_def])
+        return code
 
     def end_file_changes(self):
+        print("BEFORE END FILE CHANGES")
+        print(self.decripted)
         end_file = EndOfFileChanges(self.decripted)
         self.decripted = end_file.marks_adj()
 
@@ -133,12 +171,14 @@ class Translator:
                 var = var_element["name"]
                 self.Variables[var] = self.Variables["0_number_of_vars"]
                 self.Variables["0_number_of_vars"] += 1
+                self.Variables_with_types[var] = "variable"
             if var_element["type"] == "table":
                 table_name = var_element["name"]
                 line_no = var_element["lineno"]
                 start = var_element["range"]["start"]
                 end = var_element["range"]["end"]
                 comand += self.systemic.create_tab(table_name, start, end, line_no)
+                self.Variables_with_types[table_name] = "table"
         self.Variables["0_reg"] = 0
         self.Variables["_helper"] = self.Variables["0_number_of_vars"]
         self.Variables["0_number_of_vars"] += 1
@@ -176,15 +216,21 @@ class Translator:
                     asign_to = self.systemic.assigment_reg(statement["variable"]["name"])
                     line = exp + asign_to
                 if statement["variable_type"] == "table":
+                    print("TABLE ASSIGNEMT")
                     line = self.value_loader.save_value_from_statement_in_reg(statement["indeks"]) #reg = i
-                    line_h, helper = self.systemic.store_tab_addres_in__helper(statement["variable"])
+                    print("tu tak")
+                    line_h, helper = self.systemic.store_tab_addres_in__helper(statement["variable"]["name"])
+                    print("tu nie")
                     line +=  line_h #_helper = faktyczne i (adres tab[i] w vm)
                     line += self.value_loader.save_value_from_statement_in_reg(statement["value"]) #reg = value po prawej od znaku :=
                     line += self.register.store_i_var(helper) #adres który jest pod _helper (czyli adres tab[i]) = reg
-
+            if statement["type"] == "proc_call":
+                line = self.proc_call(statement)
 
             code += line
 
 
         return code
+
+
         

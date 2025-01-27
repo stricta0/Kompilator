@@ -1,6 +1,5 @@
 from sly import Parser, Lexer
 from Gramar import CalcLexer
-from Gramar import GF1234577
 from Errors_custom import PerserError
 
 class CalcParser(Parser):
@@ -50,7 +49,7 @@ class CalcParser(Parser):
 
     @_('args_decl COMMA T IDENTIFIER')
     def args_decl(self, p):
-        return p.args_decl + [{"type": "tab", "name": p.IDENTIFIER, 'lineno':p.lineno}]
+        return p.args_decl + [{"type": "table", "name": p.IDENTIFIER, 'lineno':p.lineno}]
 
     @_('IDENTIFIER')
     def args_decl(self, p):
@@ -58,7 +57,7 @@ class CalcParser(Parser):
 
     @_('T IDENTIFIER')
     def args_decl(self, p):
-        return [{"type": "tab", "name": p.IDENTIFIER, 'lineno':p.lineno}]
+        return [{"type": "table", "name": p.IDENTIFIER, 'lineno':p.lineno}]
     # Program główny
     @_('PROGRAM IS declarations BEGIN statements END')
     def program(self, p):
@@ -164,16 +163,15 @@ class CalcParser(Parser):
 
     @_('args_call COMMA T IDENTIFIER')
     def args_call(self, p):
-        return p.args_call + [{"type": "tab", "name": p.IDENTIFIER, 'lineno':p.lineno}]
+        return p.args_call + [{"type": "table", "name": p.IDENTIFIER, 'lineno':p.lineno}]
 
-    @_('IDENTIFIER')
-    def args_call(self, p):
-        return [{"type": "variable", "name" : p.IDENTIFIER, 'lineno':p.lineno}]
 
     @_('T IDENTIFIER')
     def args_call(self, p):
-        return [{"type": "tab", "name": p.IDENTIFIER, 'lineno':p.lineno}]
-
+        return [{"type": "table", "name": p.IDENTIFIER, 'lineno':p.lineno}]
+    @_('IDENTIFIER')
+    def args_call(self, p):
+        return [{"type": "variable", "name" : p.IDENTIFIER, 'lineno':p.lineno}]
     #END PROC CALL
 
     # Instrukcja odczytu

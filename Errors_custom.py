@@ -25,6 +25,11 @@ class VariableNotFoundError(InterpreterError):
     def __init__(self, line, error_message, var_name):
         super().__init__(line, f"Variable {var_name} dosnt exist!. More info: {error_message}")
 
+class VariableOfWrongType(InterpreterError):
+    def __init__(self, line, error_message, var_name):
+        super().__init__(line, f"Variable {var_name} has wrong type for this operation!. More info: {error_message}")
+
+
 class IteratorError(CodeError):
     def __init__(self, line, error_message):
         super().__init__(line, f"Error in for loop - cant change value of iterator: {error_message}")

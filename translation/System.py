@@ -60,6 +60,27 @@ class Systemic:
 
         return comand
 
+    def create_tab_in_procedure(self, tab_name, start, end, lineno):
+        if start > end:
+            raise ValueError(f"at line {lineno}, cant create tab with start < end!")
+
+        comand  = ""
+        comand += self.register.set_comand(-start) #reg = start
+
+        line, help_= self.register.store_helper_multiple_vars()  #tab_name przechowuje start indeks tablicy
+        self.Variables[tab_name] = self.Variables[help_]
+        comand += line #self.Variabels[tab_name] = start
+        comand += self.register.set_comand(self.Variables[tab_name] + 2) #ten jest +1 - kolejny - czyli pierwszy w tablicy - +2 #reg = indeks pierwszego elementu tablicy (przyda sie zamiast seta robic za kazdym razem bo jest drozszy)
+        comand += self.register.add_var(tab_name) #new
+        comand += self.register.store(tab_name) #new| tab_name przechowuje wartości -> -start + adres tab[0]
+        #line, tab_0 = self.register.store_helper_multiple_vars()
+        #comand += line
+        for i in range(start, end+1):
+            self.register.create_var_but_dont_store() #zarezewruj miejsce w pamieci dla zmienneych taba
+        tab_name_var = self.Variables[tab_name]
+        self.Variables.pop(tab_name)
+        return comand, tab_name_var
+
     #get statement of varible of type variable_type (tab[3] for example)
     #and returns real indeks of tab[3] in vm
     def get_real_table_variable_indeks(self, tab_name): #reg = i
@@ -71,6 +92,7 @@ class Systemic:
 
     #assume - reg = i
     def store_tab_addres_in__helper(self, tab_name):
+        print(f"VARIABLES IN HELPER: {self.Variables}")
         comand = self.get_real_table_variable_indeks(tab_name)
         line, helper = self.register.store_helper_multiple_vars()
         comand += line

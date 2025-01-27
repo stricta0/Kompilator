@@ -50,13 +50,17 @@ class Register:
                 return f"LOADI {self.Variables[var]}\n"
             return f"LOAD {self.Variables[var]}\n"
 
-    def store(self, var):
+    def store(self, var, ignore_pointer=False):
         print("SOME COMMMAND 10")
         self.check_if_variable_exists(var)
         self.has_changed_since_load = True #Somthing else changed the value
-        if self.check_if_pointer(var):
+        print(f"IN STORE VARIABLES: {self.Variables}")
+        if self.check_if_pointer(var) and not ignore_pointer:
             return f"STOREI {self.Variables[var]}\n"
         return f"STORE {self.Variables[var]}\n"
+
+    def store_indeks(self, indeks):
+        return f"STORE {indeks}\n"
 
 
     def store_helper_multiple_vars(self):
@@ -134,6 +138,10 @@ class Register:
     def marked_jump(self, mark_name, jump_type):
         self.has_changed_since_load = True
         return f"MARKED {jump_type} {mark_name}_{self.mark_zone}\n"
+
+    def static_marked_jump(self, mark_name, jump_type):
+        self.has_changed_since_load = True
+        return f"MARKED {jump_type} {mark_name}\n"
 
     def jpos(self, j):
         self.has_changed_since_load = True
