@@ -63,8 +63,7 @@ class Translator:
         self.register.set_pointer_vars(pointers)
         self.Variables_for_proc[f"0_Proc_{name}"] = {"Variables" : vars_for_proc, "pointers": pointers}
         body_code = self.translate_body_of_procedure(name, body)
-        code = comand + self.register.add_statick_mark(f"0_Proc_{name}") + body_code + "\n" #TODO: erase \n after ur done testing
-
+        code = comand + self.register.add_statick_mark(f"0_Proc_{name}") + body_code
         return code
 
 
