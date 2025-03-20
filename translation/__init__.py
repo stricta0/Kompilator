@@ -6,5 +6,6 @@ from .System import Systemic
 from .Register import Register
 from .LoopsAndIf import LoopsAndIf
 from .EndOfFileChanges import EndOfFileChanges
+from .TypeChecker import TypeChecker
 from .Translate import Translator
 

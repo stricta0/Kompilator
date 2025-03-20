@@ -1,10 +1,11 @@
 from translation import ArythmeticComparision, ArythmeticOperations
 class Arytmetic:
-    def __init__(self, Variables, register):
+    def __init__(self, Variables, register, systemic):
         self.Variables = Variables
         self.register = register
         self.operations = ArythmeticOperations(self.Variables, self.register)
         self.comparision = ArythmeticComparision(self.Variables, self.register)
+        self.systemic = systemic
         #self.lineno = 0
 
     def value_loader(self, value):
@@ -12,10 +13,14 @@ class Arytmetic:
         if value['type'] == 'expression':
             right = self.solve_expression(value)
         elif value['type'] == "number":
-            print("HERE WE USE SET COMAND")
             right = self.register.set_comand(value['value'])
         elif value['type'] == "identifier":
-            right = self.register.load_var(value['name'])
+            self.register.check_if_initialize(value["name"], value["lineno"])
+            if value['var_type'] == "table":
+                right = self.value_loader(value["indeks"])
+                right += self.systemic.load_tab_i(value['name'])
+            else:
+                right = self.register.load_var(value['name'])
         elif value['type'] == "comparison":
             right = self.solve_comparison(value)
         return right
@@ -23,7 +28,6 @@ class Arytmetic:
     #operatio n right to register
     #leave resoult in register
     def solve_expression(self, expresion):
-        print("Rozpoczeto slove_expresion")
         left = expresion['left']
         left_part = self.value_loader(left)
         right = expresion['right']
@@ -42,7 +46,7 @@ class Arytmetic:
 
     #returns True or False (reg = 1 - true, reg = 0 -> false)
     def solve_comparison(self, comparision_statment):
-        comand = self.register.make_0_and_1_if_dont_exist_already()
+        comand = ""
         right = self.value_loader(comparision_statment["right"])
         comand += right #reg = right
         line, right_val = self.register.store_helper_multiple_vars()
@@ -54,10 +58,8 @@ class Arytmetic:
         return comand
 
     def custom_comparisone_of_vars(self, var1, var2, comparisone_type):
-
         comand = ""
         self.register.check_if_variable_exists(var1)
-        print("hm??")
         self.register.check_if_variable_exists(var2)
         comand += self.register.load_var(var1)
         comand += self.register.sub_var(var2)

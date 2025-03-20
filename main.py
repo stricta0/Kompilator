@@ -9,7 +9,7 @@ file_menadger = FileMenadger()
 
 #Fast is just for develompment
 def bash_config(fast=False):
-    #Open arguments
+    #Open arguments - works only on windows OS
     if fast:
         file_name = ".\\test.txt"
         end_file_name = ".\\end.txt"
@@ -46,24 +46,18 @@ def bash_config(fast=False):
 if __name__ == '__main__':
     lexer = CalcLexer()
     parser = CalcParser()
-    file, end_file_name = bash_config(fast=True)
-    #see tokens - just for making process
-    print("Tokens:")
-    for tok in lexer.tokenize(file):
-        print(tok)
+    file, end_file_name = bash_config()
 
     try:
         result = parser.parse(lexer.tokenize(file))
         transletor = Translator(result)
         transletor.translate()
-        transletor.print()
+        #transletor.print()
         res = transletor.get_code()
         file_menadger.write(end_file_name, res)
+        print("\nSUCCES\n")
     except CustomError as e:
         print("Error during compilation")
         print(e)
     except FileNotFoundError as e:
         print("Error while dealing with file: ", e)
-    # except Exception as e:
-    #     print("Unknown error with message: ", e)
-

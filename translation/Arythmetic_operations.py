@@ -15,13 +15,10 @@ class ArythmeticOperations:
 
     def sub(self, left, right, left_token, right_token):
         comand = ""
-        #line, x = self.register.store_helper_multiple_vars()
-
         comand += right #calc right side
         line, x = self.register.store_helper_multiple_vars()
         comand += line
         comand += left  # calc left side
-        #comand += f"SUB {x}\n"  # add left side to right side
         comand += self.register.sub_var(x)
         return comand
 
@@ -31,7 +28,6 @@ class ArythmeticOperations:
             left_val = left_token['value']
             right_val = right_token['value']
             if right_val == 0:
-                comand += self.register.make_0_and_1_if_dont_exist_already()
                 comand += self.register.load_var(self.register.zero_element)
                 return comand
             resoult_of_multiple = left_val // right_val
@@ -41,7 +37,6 @@ class ArythmeticOperations:
             right_val = right_token['value']
             comand = ""
             if right_val == 0:
-                comand += self.register.make_0_and_1_if_dont_exist_already()
                 comand += self.register.load_var(self.register.zero_element)
                 return comand
             is_negaitve = False
@@ -60,7 +55,6 @@ class ArythmeticOperations:
                 return comand
         #dzielenie zwykle juz w programie
         comand = ""
-        comand += self.register.make_0_and_1_if_dont_exist_already()
         comand += left  # oblicz lewa strone
         line, a = self.register.store_helper_multiple_vars()
         comand += line  # a = left_side
@@ -74,6 +68,29 @@ class ArythmeticOperations:
         comand += self.register.load_var(self.register.zero_element) # a // 0 = 0 (wedlug definicji programu nie matematyki)
         comand += self.register.marked_jump("END", "JUMP") #koniec! #was 36
 
+        # wynik is ujemny
+        comand += self.register.load_var(self.register.zero_element)
+        line, wynik_is_ujemny = self.register.store_helper_multiple_vars()  # wynik_is_ujemny = 0
+        comand += line
+        comand += self.register.load_var(a)
+        comand += self.register.jneg(2)
+        comand += self.register.jump(6)
+        comand += self.register.sub_var(a)
+        comand += self.register.sub_var(a)
+        comand += self.register.store(a) # a = -a
+        comand += self.register.load_var(self.register.one_element)
+        comand += self.register.store(wynik_is_ujemny) #set wynik is ujemny
+        comand += self.register.load_var(b)
+        comand += self.register.jneg(2)
+        comand += self.register.jump(8)
+        comand += self.register.sub_var(b)
+        comand += self.register.sub_var(b)
+        comand += self.register.store(b) # b = -b
+        comand += self.register.store(old_b)
+        comand += self.register.load_var(wynik_is_ujemny)
+        comand += self.register.add_var(self.register.one_element)
+        comand += self.register.store(wynik_is_ujemny)
+        #end wynik is ujemny
 
         comand += self.register.load_var(self.register.zero_element)
         line, save_power = self.register.store_helper_multiple_vars() #save_power = 0
@@ -89,8 +106,9 @@ class ArythmeticOperations:
         comand += self.register.load_var(b) #reg = b
         comand += self.register.add_mark("Begin_1_loop")
         comand += self.register.sub_var(a) #reg = b - a
-        #comand += self.register.jneg(8) #if b - a < 0 : zakoncz petle
-        comand += self.register.marked_jump("End_1_loop", "JNEG")
+        #comand += self.register.jneg(8) #if b - a < 0 : kontunuuj petle
+        comand += self.register.jneg(2)
+        comand += self.register.marked_jump("End_1_loop", "JUMP")
         #cialo petli while b < a
         comand += self.register.load_var(power) #reg = power
         comand += self.register.add_var(power) #reg = 2power
@@ -116,6 +134,9 @@ class ArythmeticOperations:
         comand += self.register.store(power) #power = power // 2
         comand += self.register.add_var(save_power) #reg = power + save_power
         comand += self.register.store(save_power) #save_power = power + save_power
+        comand += self.register.load_var(b)
+        comand += self.register.half()
+        comand += self.register.store(b) # b = b // 2
         comand += self.register.load_var(a) #reg = a
         comand += self.register.sub_var(b) #reg = a - b
         comand += self.register.store(a) #a = a - b
@@ -127,6 +148,24 @@ class ArythmeticOperations:
         comand += self.register.marked_jump("Begin_loop", "JUMP")
         comand += self.register.load_var(save_power) #reg = save_power (wynik)
         comand += self.register.add_mark("END")
+
+
+
+        #execute wynik is ujemny
+        comand += self.register.store(save_power)
+        comand += self.register.load_var(wynik_is_ujemny)
+        comand += self.register.sub_var(self.register.one_element)
+        #now wynik is ujemny = -1 v 0 v 1 - jesli wynik byl zerem to jest -1, jesli 2 to 1 a wiec tylko dla 0 zmieniamy znak
+        comand += self.register.jzero(2)
+        comand += self.register.jump(4)
+        comand += self.register.load_var(self.register.zero_element)
+        comand += self.register.sub_var(save_power)
+        comand += self.register.store(save_power)
+
+        comand += self.register.load_var(save_power)
+
+
+
         self.register.new_marks() #dont use the same markers next time
         return comand
 
@@ -152,7 +191,6 @@ class ArythmeticOperations:
                 flip_resoult = True
                 val = val * -1
             if val == 0: #jesli wartosc to zero to zaladuj 0
-                comand += self.register.make_0_and_1_if_dont_exist_already()
                 comand += self.register.load_var(self.register.zero_element)
                 return comand
             if self.is_power_of_2(val): #Power of two multiple
@@ -168,7 +206,6 @@ class ArythmeticOperations:
                     comand += self.register.sub_var(res)
                 return comand
             else:
-                comand += self.register.make_0_and_1_if_dont_exist_already() #stworz zero jak nie istnieje
                 comand += self.register.load_var(self.register.zero_element) #load zero do registera
                 line, wynik = self.register.store_helper_multiple_vars() #zapisz wynik = 0
                 comand += line
@@ -204,7 +241,6 @@ class ArythmeticOperations:
         else: #zadna z zmiennych nie jest liczba!
             comand = ""
 
-            comand += self.register.make_0_and_1_if_dont_exist_already() #dodaj 0 i 1 jak nie ma
             comand += self.register.load_var(self.register.zero_element) #pobierz 0
             line, wynik = self.register.store_helper_multiple_vars() #wynik = 0
             comand += line
@@ -253,6 +289,7 @@ class ArythmeticOperations:
             comand += self.register.sub_var(wynik) #0 - wynik = -wynik
             comand += self.register.jump(2)
             comand += self.register.load_var(wynik) # = wynik
+
             self.register.new_marks()
             return comand
 
@@ -267,7 +304,6 @@ class ArythmeticOperations:
 
     def modulo(self, left, right, left_token, right_token):
         comand = ""
-        comand += self.register.make_0_and_1_if_dont_exist_already()
         comand += left  # oblicz lewa strone
         line, a = self.register.store_helper_multiple_vars()
         comand += line  # a = left_side
@@ -282,12 +318,38 @@ class ArythmeticOperations:
             self.register.zero_element)  # a // 0 = 0 (wedlug definicji programu nie matematyki)
         comand += self.register.marked_jump("END", "JUMP")  # koniec! #was 36
 
-        #if a<b: return a
+        # wynik is ujemny
+        comand += self.register.load_var(self.register.zero_element)
+        line, wynik_is_ujemny = self.register.store_helper_multiple_vars()  # wynik_is_ujemny = 0
+        comand += line
         comand += self.register.load_var(a)
+        comand += self.register.jneg(2)
+        comand += self.register.jump(4) #was 6
+        comand += self.register.sub_var(a)
+        comand += self.register.sub_var(a)
+        comand += self.register.store(a)  # a = -a
+        #comand += self.register.load_var(self.register.one_element)
+        #comand += self.register.store(wynik_is_ujemny)  # set wynik is ujemny
+        comand += self.register.load_var(b)
+        comand += self.register.jneg(2)
+        comand += self.register.jump(8)
         comand += self.register.sub_var(b)
-        comand += self.register.jzero(3)
+        comand += self.register.sub_var(b)
+        comand += self.register.store(b)  # b = -b
+        comand += self.register.store(old_b)
+        comand += self.register.load_var(wynik_is_ujemny)
+        comand += self.register.add_var(self.register.one_element)
+        comand += self.register.store(wynik_is_ujemny)
+        # end wynik is ujemny
+
+        comand += self.register.load_var(a)
+        comand += self.register.sub_var(b) # if a - b < 0: return a
+        comand += self.register.jneg(2)
+        comand += self.register.jump(3)
         comand += self.register.load_var(a)
         comand += self.register.marked_jump("END", "JUMP")
+
+
 
 
 
@@ -299,12 +361,15 @@ class ArythmeticOperations:
         # robic teraz
 
         # poczatek petli
+        comand += self.register.add_mark("Begin_loop")
         comand += self.register.load_var(self.register.one_element)
         comand += self.register.store(power)  # power = 1
         comand += self.register.load_var(b)  # reg = b
+        comand += self.register.add_mark("Begin_1_loop")
         comand += self.register.sub_var(a)  # reg = b - a
-        comand += self.register.jneg(8)  # if b - a < 0 : zakoncz petle
-
+        # comand += self.register.jneg(8) #if b - a < 0 : kontunuuj petle
+        comand += self.register.jneg(2)
+        comand += self.register.marked_jump("End_1_loop", "JUMP")
         # cialo petli while b < a
         comand += self.register.load_var(power)  # reg = power
         comand += self.register.add_var(power)  # reg = 2power
@@ -314,20 +379,25 @@ class ArythmeticOperations:
         comand += self.register.add_var(b)  # reg = 2b
         comand += self.register.store(b)  # b = 2b
 
-        comand += self.register.jump(-8)  # wroc do poczatku petli
+        # comand += self.register.jump(-8) #wroc do poczatku petli
+        comand += self.register.marked_jump("Begin_1_loop", "JUMP")
+        comand += self.register.add_mark("End_1_loop")
         # koniec petli while b < a
         comand += self.register.load_var(b)  # reg = b
         comand += self.register.sub_var(a)  # reg = b - a
         comand += self.register.jzero(2)  # if b == a
         comand += self.register.jump(4)  # else
-        comand += self.register.load_var(a)  # reg = a
-        comand += self.register.sub_var(b)  # reg = a - b
-        comand += self.register.jump(15)  # end - koniec dzielenia
+        comand += self.register.load_var(a)  # reg = power
+        comand += self.register.sub_var(b)  # reg = power + save_power
+        comand += self.register.marked_jump("END", "JUMP")  # end - koniec dzielenia
         comand += self.register.load_var(power)
         comand += self.register.half()
         comand += self.register.store(power)  # power = power // 2
         comand += self.register.add_var(save_power)  # reg = power + save_power
         comand += self.register.store(save_power)  # save_power = power + save_power
+        comand += self.register.load_var(b)
+        comand += self.register.half()
+        comand += self.register.store(b)  # b = b // 2
         comand += self.register.load_var(a)  # reg = a
         comand += self.register.sub_var(b)  # reg = a - b
         comand += self.register.store(a)  # a = a - b
@@ -335,8 +405,22 @@ class ArythmeticOperations:
         comand += self.register.store(b)  # b = old_b
         comand += self.register.sub_var(a)  # reg = b - a
         comand += self.register.jpos(2)  # if b > a - zakoncz program
-        comand += self.register.jump(-31)  # else wroc do petli
-        comand += self.register.load_var(a)  # reg = a (wynik)
+        # comand += self.register.jump(-31) #else wroc do petli
+        comand += self.register.marked_jump("Begin_loop", "JUMP")
+        comand += self.register.load_var(a)  # reg = save_power (wynik)
         comand += self.register.add_mark("END")
+
+        # execute wynik is ujemny
+        comand += self.register.store(save_power)
+        comand += self.register.load_var(wynik_is_ujemny)
+        #comand += self.register.sub_var(self.register.one_element)
+        # tutaj wynik is ujemny  = 1 lub 0 - gdzie 1 ozancza odwroc znak
+        comand += self.register.jpos(2) #was jzero
+        comand += self.register.jump(4)
+        comand += self.register.load_var(self.register.zero_element)
+        comand += self.register.sub_var(save_power)
+        comand += self.register.store(save_power)
+
+        comand += self.register.load_var(save_power)
         self.register.new_marks()  # dont use the same markers next time
         return comand

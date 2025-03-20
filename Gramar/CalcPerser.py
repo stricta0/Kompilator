@@ -67,7 +67,6 @@ class CalcParser(Parser):
     # Reguła do rozpoznawania tablicy z zakresami
     @_('declarations COMMA IDENTIFIER LTABPAREN index_range RTABPAREN')
     def declarations(self, p):
-        print("tablica :)")
         return p.declarations + [{"type": "table", "name" : p.IDENTIFIER, "range" : p.index_range, 'lineno':p.lineno}]
 
     # Deklaracje zmiennych (IDENTIFIER)
@@ -105,20 +104,18 @@ class CalcParser(Parser):
 
     @_('IF check THEN statements ELSE statements ENDIF')
     def statement(self, p):
-        print("if statment read")
         return {'type' : 'if', 'check' : p.check, 'body' : p.statements0, 'else' : p.statements1, 'lineno':p.lineno}
 
 
     @_('IF check THEN statements ENDIF')
     def statement(self, p):
-        print("if statment read")
         return {'type': 'if', 'check': p.check, 'body': p.statements, 'else': None, 'lineno':p.lineno}
 
     @_('WHILE check DO statements ENDWHILE')
     def statement(self, p):
         return {'type': 'loop', 'loop_type' : 'while', 'body': p.statements, 'lineno':p.lineno, 'check': p.check}
 
-    @_('REPEAT statements UNTIL check')
+    @_('REPEAT statements UNTIL check SEMICOLON')
     def statement(self, p):
         return {'type': 'loop', 'loop_type' : 'repeat', 'body': p.statements, 'lineno':p.lineno, 'check': p.check}
 
@@ -174,7 +171,18 @@ class CalcParser(Parser):
         return [{"type": "variable", "name" : p.IDENTIFIER, 'lineno':p.lineno}]
     #END PROC CALL
 
+#LTABPAREN
     # Instrukcja odczytu
+    @_('READ IDENTIFIER LTABPAREN MINUS NUMBER RTABPAREN SEMICOLON')
+    def statement(self, p):
+
+        return {'type': 'read', 'variable': {"type": "table", "name" : p.IDENTIFIER, 'indeks': -int(p.NUMBER), 'lineno':p.lineno}, 'lineno':p.lineno}
+
+    @_('READ IDENTIFIER LTABPAREN NUMBER RTABPAREN SEMICOLON')
+    def statement(self, p):
+
+        return {'type': 'read', 'variable': {"type": "table", "name" : p.IDENTIFIER, 'indeks': int(p.NUMBER), 'lineno':p.lineno}, 'lineno':p.lineno}
+
     @_('READ IDENTIFIER SEMICOLON')
     def statement(self, p):
 

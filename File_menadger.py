@@ -4,8 +4,6 @@ class FileMenadger:
     def read(self, file_name):
         try:
             file_path = Path(file_name)
-            print(f"file name: {file_name}")
-            print(f"Trying to open file at: {file_path.resolve()}")
             with open(file_name, 'r') as f:
                 file = f.read()
         except FileNotFoundError:

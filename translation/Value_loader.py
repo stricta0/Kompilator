@@ -11,8 +11,8 @@ class ValueLoader:
 
 
     def save_value_from_statement_in_reg(self, statement):  # save statment in reg
-
         if statement["type"] == "identifier":
+            self.register.check_if_initialize(statement["name"], statement["lineno"])
             if statement["var_type"] == "var":
                 return self.register.load_var(statement["name"])
             if statement["var_type"] == "table":

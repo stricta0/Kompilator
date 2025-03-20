@@ -5,7 +5,7 @@ class Systemic:
         self.lineno = 0
 
     def read(self, statement):
-        var = statement["variable"]
+        var = statement["variable"]["name"]
         comand = self.register.get_comand(var)
         return comand
 
@@ -53,9 +53,7 @@ class Systemic:
         comand += self.register.set_comand(self.Variables[tab_name] + 2) #ten jest +1 - kolejny - czyli pierwszy w tablicy - +2 #reg = indeks pierwszego elementu tablicy (przyda sie zamiast seta robic za kazdym razem bo jest drozszy)
         comand += self.register.add_var(tab_name) #new
         comand += self.register.store(tab_name) #new| tab_name przechowuje wartości -> -start + adres tab[0]
-        #line, tab_0 = self.register.store_helper_multiple_vars()
-        #comand += line
-        for i in range(start, end+1):
+        for i in range(start, end+2):
             self.register.create_var_but_dont_store() #zarezewruj miejsce w pamieci dla zmienneych taba
 
         return comand
@@ -73,9 +71,7 @@ class Systemic:
         comand += self.register.set_comand(self.Variables[tab_name] + 2) #ten jest +1 - kolejny - czyli pierwszy w tablicy - +2 #reg = indeks pierwszego elementu tablicy (przyda sie zamiast seta robic za kazdym razem bo jest drozszy)
         comand += self.register.add_var(tab_name) #new
         comand += self.register.store(tab_name) #new| tab_name przechowuje wartości -> -start + adres tab[0]
-        #line, tab_0 = self.register.store_helper_multiple_vars()
-        #comand += line
-        for i in range(start, end+1):
+        for i in range(start, end+2):
             self.register.create_var_but_dont_store() #zarezewruj miejsce w pamieci dla zmienneych taba
         tab_name_var = self.Variables[tab_name]
         self.Variables.pop(tab_name)
@@ -84,19 +80,15 @@ class Systemic:
     #get statement of varible of type variable_type (tab[3] for example)
     #and returns real indeks of tab[3] in vm
     def get_real_table_variable_indeks(self, tab_name): #reg = i
-        #indeks_zero = indeks_of_element_with_start_val + 1  # indeks pierwszego elememntu tablicy (tab[0])
         comand = ""
         comand += self.register.add_var(tab_name)  # reg = i - start
-        #comand += self.register.add(indeks_zero)  # reg = i - start + adres_tab[0] - mam nadzieje ze dziala xd
         return comand
 
     #assume - reg = i
     def store_tab_addres_in__helper(self, tab_name):
-        print(f"VARIABLES IN HELPER: {self.Variables}")
         comand = self.get_real_table_variable_indeks(tab_name)
         line, helper = self.register.store_helper_multiple_vars()
         comand += line
-        #comand += self.register.store("_helper")
         return comand, helper
 
     def load_tab_i(self, tab_name): #LOAD
