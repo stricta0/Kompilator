@@ -23,4 +23,4 @@ Mikolaj Chicinski 272337
 
 ### Autor maszyny wirtualnej
 
-Maszyna wirtualna w projektcie, i wszystkie treści zawarte w folderze "labor 4 (1)" nie są mojge autorstwa
+Maszyna wirtualna w projekcie oraz wszystkie treści zawarte w folderze „labor 4 (1)” są autorstwa prof. Macieja Gębali.
